@@ -1,4 +1,4 @@
-project "runge-kutta"
+project "rk-integrator"
    language "C++"
    cppdialect "C++20"
    staticruntime "on"
