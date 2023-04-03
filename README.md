@@ -11,9 +11,9 @@ rk-integrator is a C++ implementation of the family of explicit Runge-Kutta inte
 
 ## Dependencies
 
-- [debug-tools](https://github.com/Ismael99Bueno/debug-tools): a set of tools for debugging the integrator
-- [profile-tools](https://github.com/Ismael99Bueno/profile-tools): a set of tools for profiling the integrator
-- [ini-parser](https://github.com/Ismael99Bueno/ini-parser): a simple INI file parser that allows for reading and writing the state of an integrator or the data of a butcher tableau to and from a file
+- [debug-tools](https://github.com/Ismael99Bueno/debug-tools): A set of tools for debugging the integrator
+- [profile-tools](https://github.com/Ismael99Bueno/profile-tools): A set of tools for profiling the integrator
+- [ini-parser](https://github.com/Ismael99Bueno/ini-parser): A simple INI file parser that allows for reading and writing the state of an integrator or the data of a butcher tableau to and from a file
 
 ## Usage
 
