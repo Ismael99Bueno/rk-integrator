@@ -11,9 +11,9 @@ rk-integrator is a C++ implementation of the family of explicit Runge-Kutta inte
 
 ## Dependencies
 
-- [debug-tools](https://github.com/Ismael99Bueno/debug-tools): A set of tools for debugging the integrator
-- [profile-tools](https://github.com/Ismael99Bueno/profile-tools): A set of tools for profiling the integrator
-- [ini-parser](https://github.com/Ismael99Bueno/ini-parser): A simple INI file parser that allows for reading and writing the state of an integrator or the data of a butcher tableau to and from a file
+- [debug-tools](https://github.com/ismawno/debug-tools): A set of tools for debugging the integrator
+- [profile-tools](https://github.com/ismawno/profile-tools): A set of tools for profiling the integrator
+- [ini-parser](https://github.com/ismawno/ini-parser): A simple INI file parser that allows for reading and writing the state of an integrator or the data of a butcher tableau to and from a file
 
 There is a Python script located in the `scripts` folder named `fetch_dependencies.py`. This script will automatically add all the dependencies as git submodules, provided that the user has already created their own repository and included the current project as a git submodule (or at least downloaded it into the repository). To ensure all runs smoothly once the script has been executed, do not rename the folders containing the various dependencies. All external dependencies, those not created by the same author, will be added as submodules within a folder called `vendor`.
 
