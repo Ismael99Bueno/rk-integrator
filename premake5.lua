@@ -1,6 +1,7 @@
 project "rk-integrator"
    language "C++"
    cppdialect "C++17"
+   buildoptions "-Wall"
    
    staticruntime "off"
    kind "StaticLib"
