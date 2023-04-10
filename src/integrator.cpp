@@ -71,11 +71,11 @@ namespace rk
 
     void integrator::read(ini::input &in)
     {
-        m_tolerance = in.readf("tolerance");
-        m_min_dt = in.readf("min_dt");
-        m_max_dt = in.readf("max_dt");
-        m_error = in.readf("error");
-        m_valid = (bool)in.readi("valid");
+        m_tolerance = in.readf32("tolerance");
+        m_min_dt = in.readf32("min_dt");
+        m_max_dt = in.readf32("max_dt");
+        m_error = in.readf32("error");
+        m_valid = (bool)in.readi16("valid");
 
         in.begin_section("tableau");
         m_tableau.read(in);

@@ -45,7 +45,7 @@ namespace rk
     void state::read(ini::input &in)
     {
         clear();
-        const std::uint8_t stage = in.readi("stage");
+        const std::uint8_t stage = in.readui32("stage");
 
         std::string key = "state";
         std::size_t index = 0;
@@ -54,7 +54,7 @@ namespace rk
             const std::string full_key = key + std::to_string(index++);
             if (!in.contains_key(full_key))
                 break;
-            m_vars.push_back(in.readf(full_key));
+            m_vars.push_back(in.readf32(full_key));
         }
 
         key = "step";
@@ -64,7 +64,7 @@ namespace rk
             const std::string full_key = key + std::to_string(index++);
             if (!in.contains_key(full_key))
                 break;
-            m_step.emplace_back(in.readf(full_key));
+            m_step.emplace_back(in.readf32(full_key));
         }
 
         key = "kvec";
@@ -77,7 +77,7 @@ namespace rk
                 const std::string full_key = key + std::to_string(i) + std::to_string(index++);
                 if (!in.contains_key(full_key))
                     break;
-                m_kvec[i].emplace_back(in.readf(full_key));
+                m_kvec[i].emplace_back(in.readf32(full_key));
             }
         }
     }

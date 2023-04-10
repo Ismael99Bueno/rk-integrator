@@ -55,10 +55,10 @@ namespace rk
 
     void butcher_tableau::read(ini::input &in)
     {
-        m_embedded = (bool)in.readi("embedded");
-        m_stage = in.readi("stage");
-        m_order = in.readi("order");
-        const std::size_t beta_size = in.readi("beta_size");
+        m_embedded = (bool)in.readi16("embedded");
+        m_stage = in.readui32("stage");
+        m_order = in.readui32("order");
+        const std::size_t beta_size = in.readui64("beta_size");
 
         m_alpha.clear();
         std::string key = "alpha";
@@ -68,7 +68,7 @@ namespace rk
             const std::string full_key = key + std::to_string(index++);
             if (!in.contains_key(full_key))
                 break;
-            m_alpha.emplace_back(in.readf(full_key));
+            m_alpha.emplace_back(in.readf32(full_key));
         }
 
         m_beta.clear();
@@ -82,7 +82,7 @@ namespace rk
                 const std::string full_key = key + std::to_string(i) + std::to_string(index++);
                 if (!in.contains_key(full_key))
                     break;
-                m_beta[i].emplace_back(in.readf(full_key));
+                m_beta[i].emplace_back(in.readf32(full_key));
             }
         }
 
@@ -94,7 +94,7 @@ namespace rk
             const std::string full_key = key + std::to_string(index++);
             if (!in.contains_key(full_key))
                 break;
-            m_coefs1.emplace_back(in.readf(full_key));
+            m_coefs1.emplace_back(in.readf32(full_key));
         }
         if (!m_embedded)
             return;
@@ -107,7 +107,7 @@ namespace rk
             const std::string full_key = key + std::to_string(index++);
             if (!in.contains_key(full_key))
                 break;
-            m_coefs2.emplace_back(in.readf(full_key));
+            m_coefs2.emplace_back(in.readf32(full_key));
         }
     }
 
