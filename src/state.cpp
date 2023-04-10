@@ -45,7 +45,7 @@ namespace rk
     void state::read(ini::input &in)
     {
         clear();
-        const std::uint8_t stage = in.readui32("stage");
+        const std::uint8_t stage = (std::uint8_t)in.readui32("stage");
 
         std::string key = "state";
         std::size_t index = 0;

@@ -50,7 +50,7 @@ namespace rk
             base *= base;
         }
 
-        return result;
+        return (std::uint32_t)result;
     }
 
     void integrator::write(ini::output &out) const

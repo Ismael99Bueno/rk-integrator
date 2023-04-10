@@ -56,8 +56,8 @@ namespace rk
     void butcher_tableau::read(ini::input &in)
     {
         m_embedded = (bool)in.readi16("embedded");
-        m_stage = in.readui32("stage");
-        m_order = in.readui32("order");
+        m_stage = (std::uint8_t)in.readui32("stage");
+        m_order = (std::uint8_t)in.readui32("order");
         const std::size_t beta_size = in.readui64("beta_size");
 
         m_alpha.clear();
