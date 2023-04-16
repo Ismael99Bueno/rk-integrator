@@ -30,7 +30,7 @@ namespace rk
                          std::vector<float> (*ode)(float, const std::vector<float> &, T &))
         {
             PERF_SCOPE("-Physics-")
-            DBG_ASSERT(!dt_off_bounds(dt), "Timestep is not between established limits. Change the timestep or adjust the limits to include the vars value - vars: %f, min: %f, max: %f\n", dt, m_min_dt, m_max_dt)
+            DBG_ASSERT(!dt_off_bounds(dt), "Timestep is not between established limits. Change the timestep or adjust the limits to include the current value - current: %f, min: %f, max: %f\n", dt, m_min_dt, m_max_dt)
             m_valid = true;
             const float sdt = m_reversed ? -dt : dt;
 
