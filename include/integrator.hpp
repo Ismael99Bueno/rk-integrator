@@ -154,11 +154,14 @@ namespace rk
         bool reversed() const;
         void reversed(bool reversed);
 
+        bool limited_timestep() const;
+        void limited_timestep(bool limited_timestep);
+
     private:
         butcher_tableau m_tableau;
         rk::state m_state;
         float m_tolerance, m_min_dt, m_max_dt, m_error;
-        bool m_valid, m_reversed = false;
+        bool m_valid, m_reversed = false, m_limited_timestep = true;
 
         std::vector<float> generate_solution(float dt,
                                              const std::vector<float> &vars,

@@ -85,9 +85,9 @@ namespace rk
         in.end_section();
     }
 
-    bool integrator::dt_too_small(const float dt) const { return dt < m_min_dt; }
-    bool integrator::dt_too_big(const float dt) const { return dt > m_max_dt; }
-    bool integrator::dt_off_bounds(const float dt) const { return dt_too_small(dt) || dt_too_big(dt); }
+    bool integrator::dt_too_small(const float dt) const { return m_limited_timestep && dt < m_min_dt; }
+    bool integrator::dt_too_big(const float dt) const { return m_limited_timestep && dt > m_max_dt; }
+    bool integrator::dt_off_bounds(const float dt) const { return m_limited_timestep && (dt_too_small(dt) || dt_too_big(dt)); }
 
     float integrator::embedded_error(const std::vector<float> &sol1, const std::vector<float> &sol2)
     {
@@ -130,4 +130,7 @@ namespace rk
 
     bool integrator::reversed() const { return m_reversed; }
     void integrator::reversed(bool reversed) { m_reversed = reversed; }
+
+    bool integrator::limited_timestep() const { return m_limited_timestep; }
+    void integrator::limited_timestep(bool limited_timestep) { m_limited_timestep = limited_timestep; }
 }
