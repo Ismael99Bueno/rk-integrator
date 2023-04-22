@@ -1,7 +1,7 @@
 #ifndef TABLEAUS_HPP
 #define TABLEAUS_HPP
 
-#include "butcher_tableau.hpp"
+#include "rk/butcher_tableau.hpp"
 
 namespace rk
 {

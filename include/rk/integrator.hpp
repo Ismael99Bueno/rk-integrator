@@ -1,10 +1,10 @@
 #ifndef INTEGRATOR_HPP
 #define INTEGRATOR_HPP
 
-#include "butcher_tableau.hpp"
-#include "debug.hpp"
-#include "perf.hpp"
-#include "state.hpp"
+#include "rk/butcher_tableau.hpp"
+#include "debug/debug.hpp"
+#include "perf/perf.hpp"
+#include "rk/state.hpp"
 #include <cstdint>
 #include <cmath>
 

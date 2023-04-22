@@ -1,4 +1,4 @@
-#include "tableaus.hpp"
+#include "rk/tableaus.hpp"
 
 namespace rk
 {

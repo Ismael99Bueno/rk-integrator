@@ -1,4 +1,4 @@
-#include "butcher_tableau.hpp"
+#include "rk/butcher_tableau.hpp"
 
 namespace rk
 {
