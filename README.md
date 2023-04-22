@@ -25,7 +25,7 @@ The [fetch_dependencies.py](https://github.com/ismawno/rk-integrator/scripts/fet
 4. Create an entry point project with a `premake5` file, where the `main.cpp` will be located. Link all libraries and specify the kind of the executable as `ConsoleApp`. Don't forget to specify the different configurations for the project.
 5. Create a `premake5` file at the root of the repository describing the `premake` workspace and including all dependency projects.
 6. Build the entire project by running the `make` command in your terminal. You can specify the configuration by using `make config=the_configuration`.
-7. To use rk-integrator, simply include the [integrator.hpp](https://github.com/ismawno/rk-integrator/include/integrator.hpp) header in your project. If you'd like to use a default Butcher tableau, also include the [tableaus.hpp](https://github.com/ismawno/rk-integrator/include/tableaus.hpp) header.
+7. To use rk-integrator, simply include the [integrator.hpp](https://github.com/ismawno/rk-integrator/include/rk/integrator.hpp) header in your project. If you'd like to use a default Butcher tableau, also include the [tableaus.hpp](https://github.com/ismawno/rk-integrator/include/rk/tableaus.hpp) header.
 
 For more information on how to use rk-integrator, please refer to the documentation.
 
