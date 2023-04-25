@@ -64,7 +64,7 @@ namespace rk
             const std::string full_key = key + std::to_string(index++);
             if (!in.contains_key(full_key))
                 break;
-            m_step.emplace_back(in.readf32(full_key));
+            m_step.push_back(in.readf32(full_key));
         }
 
         key = "kvec";
@@ -77,7 +77,7 @@ namespace rk
                 const std::string full_key = key + std::to_string(i) + std::to_string(index++);
                 if (!in.contains_key(full_key))
                     break;
-                m_kvec[i].emplace_back(in.readf32(full_key));
+                m_kvec[i].push_back(in.readf32(full_key));
             }
         }
     }

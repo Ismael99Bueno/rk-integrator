@@ -32,7 +32,7 @@ namespace rk
 
             const float step = sum * dt;
             m_state.m_step[j] = step;
-            sol.emplace_back(vars[j] + step);
+            sol.push_back(vars[j] + step);
         }
         return sol;
     }

@@ -68,7 +68,7 @@ namespace rk
             const std::string full_key = key + std::to_string(index++);
             if (!in.contains_key(full_key))
                 break;
-            m_alpha.emplace_back(in.readf32(full_key));
+            m_alpha.push_back(in.readf32(full_key));
         }
 
         m_beta.clear();
@@ -82,7 +82,7 @@ namespace rk
                 const std::string full_key = key + std::to_string(i) + std::to_string(index++);
                 if (!in.contains_key(full_key))
                     break;
-                m_beta[i].emplace_back(in.readf32(full_key));
+                m_beta[i].push_back(in.readf32(full_key));
             }
         }
 
@@ -94,7 +94,7 @@ namespace rk
             const std::string full_key = key + std::to_string(index++);
             if (!in.contains_key(full_key))
                 break;
-            m_coefs1.emplace_back(in.readf32(full_key));
+            m_coefs1.push_back(in.readf32(full_key));
         }
         if (!m_embedded)
             return;
@@ -107,7 +107,7 @@ namespace rk
             const std::string full_key = key + std::to_string(index++);
             if (!in.contains_key(full_key))
                 break;
-            m_coefs2.emplace_back(in.readf32(full_key));
+            m_coefs2.push_back(in.readf32(full_key));
         }
     }
 
