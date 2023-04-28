@@ -1,3 +1,4 @@
+#include "rk/pch.hpp"
 #include "rk/tableaus.hpp"
 
 namespace rk

@@ -1,3 +1,4 @@
+#include "rk/pch.hpp"
 #include "rk/butcher_tableau.hpp"
 
 namespace rk
