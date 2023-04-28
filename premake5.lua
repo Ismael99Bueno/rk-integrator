@@ -5,7 +5,7 @@ project "rk-integrator"
       buildoptions {"-Wall", "-Wextra", "-Wpedantic", "-Wconversion", "-Wno-unused-parameter"}
    filter{}
 
-   pchheader "include/rk/pch.hpp"
+   pchheader "rk/pch.hpp"
    pchsource "src/pch.cpp"
    
    staticruntime "off"
