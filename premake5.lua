@@ -1,19 +1,28 @@
 project "rk-integrator"
-   language "C++"
-   cppdialect "C++17"
-   filter "system:macosx"
-      buildoptions {"-Wall", "-Wextra", "-Wpedantic", "-Wconversion", "-Wno-unused-parameter"}
-   filter{}
+language "C++"
+cppdialect "C++17"
+filter "system:macosx"
+buildoptions {
+   "-Wall",
+   "-Wextra",
+   "-Wpedantic",
+   "-Wconversion",
+   "-Wno-unused-parameter"
+}
+filter {}
 
-   pchheader "rk/pch.hpp"
-   pchsource "src/pch.cpp"
-   
-   staticruntime "off"
-   kind "StaticLib"
+pchheader "rk/pch.hpp"
+pchsource "src/pch.cpp"
 
-   targetdir("bin/" .. outputdir)
-   objdir("build/" .. outputdir)
+staticruntime "off"
+kind "StaticLib"
 
-   files {"src/**.cpp", "include/**.hpp"}
+targetdir("bin/" .. outputdir)
+objdir("build/" .. outputdir)
 
-   includedirs "../**/include"
+files {
+   "src/**.cpp",
+   "include/**.hpp"
+}
+
+includedirs "../**/include"
