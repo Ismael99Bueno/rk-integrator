@@ -1,12 +1,12 @@
 #ifndef STATE_HPP
 #define STATE_HPP
 
-#include "ini/saveable.hpp"
+#include "ini/serializable.hpp"
 #include <vector>
 
 namespace rk
 {
-    class state : public ini::saveable
+    class state : public ini::serializable
     {
     public:
         void push_back(float elm);
@@ -16,8 +16,8 @@ namespace rk
         void reserve(std::size_t capacity);
         void clear();
 
-        void write(ini::output &out) const override;
-        void read(ini::input &in) override;
+        void serialize(ini::serializer &out) const override;
+        void deserialize(ini::deserializer &in) override;
 
         const float &operator[](std::size_t index) const;
         float &operator[](std::size_t index);

@@ -27,7 +27,7 @@ namespace rk
         resize();
     }
 
-    void state::write(ini::output &out) const
+    void state::serialize(ini::serializer &out) const
     {
         out.write("stage", m_kvec.size());
         std::string key = "state";
@@ -43,7 +43,7 @@ namespace rk
             for (std::size_t j = 0; j < m_kvec[i].size(); j++)
                 out.write(key + std::to_string(i) + std::to_string(j), m_kvec[i][j]);
     }
-    void state::read(ini::input &in)
+    void state::deserialize(ini::deserializer &in)
     {
         clear();
         const std::uint8_t stage = (std::uint8_t)in.readui32("stage");

@@ -1,13 +1,13 @@
 #ifndef BUTCHER_TABLEAU_HPP
 #define BUTCHER_TABLEAU_HPP
 
-#include "ini/saveable.hpp"
+#include "ini/serializable.hpp"
 #include <vector>
 #include <cstdint>
 
 namespace rk
 {
-    class butcher_tableau : public ini::saveable
+    class butcher_tableau : public ini::serializable
     {
     private:
     public:
@@ -26,8 +26,8 @@ namespace rk
                         std::uint8_t stage,
                         std::uint8_t order);
 
-        void write(ini::output &out) const override;
-        void read(ini::input &in) override;
+        void serialize(ini::serializer &out) const override;
+        void deserialize(ini::deserializer &in) override;
 
         const std::vector<float> &alpha() const;
         const std::vector<std::vector<float>> &beta() const;

@@ -12,7 +12,7 @@
 
 namespace rk
 {
-    class integrator : public ini::saveable
+    class integrator : public ini::serializable
     {
     private:
     public:
@@ -133,8 +133,8 @@ namespace rk
             return m_valid;
         }
 
-        void write(ini::output &out) const override;
-        void read(ini::input &in) override;
+        void serialize(ini::serializer &out) const override;
+        void deserialize(ini::deserializer &in) override;
 
         const butcher_tableau &tableau() const;
         const rk::state &state() const;

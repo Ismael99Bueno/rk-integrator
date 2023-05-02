@@ -54,7 +54,7 @@ namespace rk
         return (std::uint32_t)result;
     }
 
-    void integrator::write(ini::output &out) const
+    void integrator::serialize(ini::serializer &out) const
     {
         out.write("tolerance", m_tolerance);
         out.write("min_dt", m_min_dt);
@@ -63,14 +63,14 @@ namespace rk
         out.write("valid", m_valid);
 
         out.begin_section("tableau");
-        m_tableau.write(out);
+        m_tableau.serialize(out);
         out.end_section();
         out.begin_section("state");
-        m_state.write(out);
+        m_state.serialize(out);
         out.end_section();
     }
 
-    void integrator::read(ini::input &in)
+    void integrator::deserialize(ini::deserializer &in)
     {
         m_tolerance = in.readf32("tolerance");
         m_min_dt = in.readf32("min_dt");
@@ -79,10 +79,10 @@ namespace rk
         m_valid = (bool)in.readi16("valid");
 
         in.begin_section("tableau");
-        m_tableau.read(in);
+        m_tableau.deserialize(in);
         in.end_section();
         in.begin_section("state");
-        m_state.read(in);
+        m_state.deserialize(in);
         in.end_section();
     }
 

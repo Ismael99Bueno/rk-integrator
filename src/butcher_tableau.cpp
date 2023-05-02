@@ -27,7 +27,7 @@ namespace rk
                                                                  m_stage(stage),
                                                                  m_order(order) {}
 
-    void butcher_tableau::write(ini::output &out) const
+    void butcher_tableau::serialize(ini::serializer &out) const
     {
         out.write("embedded", m_embedded);
         out.write("stage", (int)m_stage);
@@ -54,7 +54,7 @@ namespace rk
             out.write(key + std::to_string(i), m_coefs2[i]);
     }
 
-    void butcher_tableau::read(ini::input &in)
+    void butcher_tableau::deserialize(ini::deserializer &in)
     {
         m_embedded = (bool)in.readi16("embedded");
         m_stage = (std::uint8_t)in.readui32("stage");
