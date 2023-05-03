@@ -3,8 +3,8 @@
 
 namespace rk
 {
-    state::state(const std::vector<float> &vars, const std::uint8_t stage) : m_vars(vars),
-                                                                             m_kvec(stage)
+    state::state(const std::vector<float> &vars, const std::uint16_t stage) : m_vars(vars),
+                                                                              m_kvec(stage)
     {
         resize();
     }
@@ -109,7 +109,7 @@ namespace rk
         m_step.resize(m_vars.size());
     }
 
-    void state::resize_kvec(const std::uint8_t stage)
+    void state::resize_kvec(const std::uint16_t stage)
     {
         m_kvec.resize(stage);
         resize();
@@ -125,4 +125,62 @@ namespace rk
     }
 
     std::size_t state::size() const { return m_vars.size(); }
+#ifdef HAS_YAML_CPP
+    YAML::Emitter &operator<<(YAML::Emitter &out, const state &st)
+    {
+        out << YAML::BeginMap;
+        out << YAML::Key << "vars" << YAML::Value << YAML::Flow << st.vars();
+        out << YAML::Key << "step" << YAML::Value << YAML::Flow << st.step();
+        out << YAML::Key << "k_vec" << YAML::Value << YAML::BeginSeq;
+        for (const auto &v : st.m_kvec)
+            out << YAML::Flow << v;
+        out << YAML::EndSeq << YAML::EndMap;
+        return out;
+    }
+#endif
 }
+
+#ifdef HAS_YAML_CPP
+namespace YAML
+{
+    Node convert<rk::state>::encode(const rk::state &st)
+    {
+        Node node;
+        node["vars"] = st.vars();
+        node["step"] = st.step();
+        node["vars"].SetStyle(YAML::EmitterStyle::Flow);
+        node["step"].SetStyle(YAML::EmitterStyle::Flow);
+        for (const auto &v : st.m_kvec)
+        {
+            Node child;
+            child = v;
+            child.SetStyle(YAML::EmitterStyle::Flow);
+            node["k_vec"].push_back(v);
+        }
+        return node;
+    }
+    bool convert<rk::state>::decode(const Node &node, rk::state &st)
+    {
+        if (!node.IsMap() || node.size() != 3)
+            return false;
+
+        std::vector<float> vars, step;
+        std::vector<std::vector<float>> k_vec;
+        for (const auto &n1 : node["k_vec"])
+        {
+            auto &v1 = k_vec.emplace_back();
+            for (const auto &n2 : n1)
+                v1.push_back(n2.as<float>());
+        }
+        for (const auto &n : node["vars"])
+            vars.push_back(n.as<float>());
+        for (const auto &n : node["step"])
+            step.push_back(n.as<float>());
+        st.m_vars = vars;
+        st.m_step = step;
+        st.m_kvec = k_vec;
+
+        return true;
+    };
+}
+#endif

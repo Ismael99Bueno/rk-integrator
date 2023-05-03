@@ -54,38 +54,6 @@ namespace rk
         return (std::uint32_t)result;
     }
 
-    // void integrator::serialize(ini::serializer &out) const
-    // {
-    //     out.write("tolerance", m_tolerance);
-    //     out.write("min_dt", m_min_dt);
-    //     out.write("max_dt", m_max_dt);
-    //     out.write("error", m_error);
-    //     out.write("valid", m_valid);
-
-    //     out.begin_section("tableau");
-    //     m_tableau.serialize(out);
-    //     out.end_section();
-    //     out.begin_section("state");
-    //     m_state.serialize(out);
-    //     out.end_section();
-    // }
-
-    // void integrator::deserialize(ini::deserializer &in)
-    // {
-    //     m_tolerance = in.readf32("tolerance");
-    //     m_min_dt = in.readf32("min_dt");
-    //     m_max_dt = in.readf32("max_dt");
-    //     m_error = in.readf32("error");
-    //     m_valid = (bool)in.readi16("valid");
-
-    //     in.begin_section("tableau");
-    //     m_tableau.deserialize(in);
-    //     in.end_section();
-    //     in.begin_section("state");
-    //     m_state.deserialize(in);
-    //     in.end_section();
-    // }
-
     bool integrator::dt_too_small(const float dt) const { return m_limited_timestep && dt < m_min_dt; }
     bool integrator::dt_too_big(const float dt) const { return m_limited_timestep && dt > m_max_dt; }
     bool integrator::dt_off_bounds(const float dt) const { return m_limited_timestep && (dt_too_small(dt) || dt_too_big(dt)); }
@@ -134,4 +102,52 @@ namespace rk
 
     bool integrator::limited_timestep() const { return m_limited_timestep; }
     void integrator::limited_timestep(bool limited_timestep) { m_limited_timestep = limited_timestep; }
+
+#ifdef HAS_YAML_CPP
+    YAML::Emitter &operator<<(YAML::Emitter &out, const integrator &integ)
+    {
+        out << YAML::BeginMap;
+        out << YAML::Key << "tableau" << YAML::Value << integ.tableau();
+        out << YAML::Key << "state" << YAML::Value << integ.state();
+        out << YAML::Key << "tolerance" << YAML::Value << integ.tolerance();
+        out << YAML::Key << "min_dt" << YAML::Value << integ.min_dt();
+        out << YAML::Key << "max_dt" << YAML::Value << integ.max_dt();
+        out << YAML::Key << "reversed" << YAML::Value << integ.reversed();
+        out << YAML::Key << "limited_timestep" << YAML::Value << integ.limited_timestep();
+        out << YAML::EndMap;
+        return out;
+    }
+#endif
 }
+
+#ifdef HAS_YAML_CPP
+namespace YAML
+{
+    Node convert<rk::integrator>::encode(const rk::integrator &integ)
+    {
+        Node node;
+        node["tableau"] = integ.tableau();
+        node["state"] = integ.state();
+        node["tolerance"] = integ.tolerance();
+        node["min_dt"] = integ.min_dt();
+        node["max_dt"] = integ.max_dt();
+        node["reversed"] = integ.reversed();
+        node["limited_timestep"] = integ.limited_timestep();
+        return node;
+    }
+    bool convert<rk::integrator>::decode(const Node &node, rk::integrator &integ)
+    {
+        if (!node.IsMap() || node.size() != 7)
+            return false;
+
+        integ.tableau(node["tableau"].as<rk::butcher_tableau>());
+        integ.m_state = node["state"].as<rk::state>();
+        integ.tolerance(node["tolerance"].as<float>());
+        integ.min_dt(node["min_dt"].as<float>());
+        integ.max_dt(node["max_dt"].as<float>());
+        integ.reversed(node["reversed"].as<bool>());
+        integ.limited_timestep(node["limited_timestep"].as<bool>());
+        return true;
+    };
+}
+#endif

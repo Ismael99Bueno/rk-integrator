@@ -8,6 +8,9 @@ namespace rk
     class state
     {
     public:
+        state() = default;
+        state(const std::vector<float> &vars, std::uint16_t stage);
+
         void push_back(float elm);
         void append(std::initializer_list<float> lst);
         void resize(std::size_t size);
@@ -26,17 +29,32 @@ namespace rk
         std::size_t size() const;
 
     private:
-        state() = default;
-        state(const std::vector<float> &vars, std::uint8_t stage);
-
         void resize();
-        void resize_kvec(std::uint8_t stage);
+        void resize_kvec(std::uint16_t stage);
 
         std::vector<float> m_vars, m_step;
         std::vector<std::vector<float>> m_kvec;
 
         friend class integrator;
+#ifdef HAS_YAML_CPP
+        friend YAML::Emitter &operator<<(YAML::Emitter &out, const state &st);
+        friend struct YAML::convert<state>;
+#endif
     };
+#ifdef HAS_YAML_CPP
+    YAML::Emitter &operator<<(YAML::Emitter &out, const state &st);
+#endif
 }
 
+#ifdef HAS_YAML_CPP
+namespace YAML
+{
+    template <>
+    struct convert<rk::state>
+    {
+        static Node encode(const rk::state &st);
+        static bool decode(const Node &node, rk::state &st);
+    };
+}
+#endif
 #endif

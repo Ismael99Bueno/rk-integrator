@@ -196,7 +196,26 @@ namespace rk
                 kvec[i] = ode(t + m_tableau.alpha()[i - 1] * dt, aux_vars, params);
             }
         }
+#ifdef HAS_YAML_CPP
+        friend YAML::Emitter &operator<<(YAML::Emitter &out, const integrator &st);
+        friend struct YAML::convert<integrator>;
+#endif
     };
+
+#ifdef HAS_YAML_CPP
+    YAML::Emitter &operator<<(YAML::Emitter &out, const integrator &integ);
+#endif
 }
 
+#ifdef HAS_YAML_CPP
+namespace YAML
+{
+    template <>
+    struct convert<rk::integrator>
+    {
+        static Node encode(const rk::integrator &integ);
+        static bool decode(const Node &node, rk::integrator &integ);
+    };
+}
+#endif
 #endif
