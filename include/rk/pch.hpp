@@ -4,5 +4,6 @@
 #include <vector>
 #include <cstdint>
 #include <cmath>
+#include <yaml-cpp/yaml.h>
 
 #endif

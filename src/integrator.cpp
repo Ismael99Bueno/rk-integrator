@@ -54,37 +54,37 @@ namespace rk
         return (std::uint32_t)result;
     }
 
-    void integrator::serialize(ini::serializer &out) const
-    {
-        out.write("tolerance", m_tolerance);
-        out.write("min_dt", m_min_dt);
-        out.write("max_dt", m_max_dt);
-        out.write("error", m_error);
-        out.write("valid", m_valid);
+    // void integrator::serialize(ini::serializer &out) const
+    // {
+    //     out.write("tolerance", m_tolerance);
+    //     out.write("min_dt", m_min_dt);
+    //     out.write("max_dt", m_max_dt);
+    //     out.write("error", m_error);
+    //     out.write("valid", m_valid);
 
-        out.begin_section("tableau");
-        m_tableau.serialize(out);
-        out.end_section();
-        out.begin_section("state");
-        m_state.serialize(out);
-        out.end_section();
-    }
+    //     out.begin_section("tableau");
+    //     m_tableau.serialize(out);
+    //     out.end_section();
+    //     out.begin_section("state");
+    //     m_state.serialize(out);
+    //     out.end_section();
+    // }
 
-    void integrator::deserialize(ini::deserializer &in)
-    {
-        m_tolerance = in.readf32("tolerance");
-        m_min_dt = in.readf32("min_dt");
-        m_max_dt = in.readf32("max_dt");
-        m_error = in.readf32("error");
-        m_valid = (bool)in.readi16("valid");
+    // void integrator::deserialize(ini::deserializer &in)
+    // {
+    //     m_tolerance = in.readf32("tolerance");
+    //     m_min_dt = in.readf32("min_dt");
+    //     m_max_dt = in.readf32("max_dt");
+    //     m_error = in.readf32("error");
+    //     m_valid = (bool)in.readi16("valid");
 
-        in.begin_section("tableau");
-        m_tableau.deserialize(in);
-        in.end_section();
-        in.begin_section("state");
-        m_state.deserialize(in);
-        in.end_section();
-    }
+    //     in.begin_section("tableau");
+    //     m_tableau.deserialize(in);
+    //     in.end_section();
+    //     in.begin_section("state");
+    //     m_state.deserialize(in);
+    //     in.end_section();
+    // }
 
     bool integrator::dt_too_small(const float dt) const { return m_limited_timestep && dt < m_min_dt; }
     bool integrator::dt_too_big(const float dt) const { return m_limited_timestep && dt > m_max_dt; }

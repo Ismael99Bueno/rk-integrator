@@ -12,7 +12,7 @@
 
 namespace rk
 {
-    class integrator : public ini::serializable
+    class integrator
     {
     private:
     public:
@@ -132,9 +132,6 @@ namespace rk
             DBG_LOG_IF(!m_valid, "NaN encountered when computing runge-kutta solution.\n")
             return m_valid;
         }
-
-        void serialize(ini::serializer &out) const override;
-        void deserialize(ini::deserializer &in) override;
 
         const butcher_tableau &tableau() const;
         const rk::state &state() const;

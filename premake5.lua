@@ -20,6 +20,7 @@ kind "StaticLib"
 
 targetdir("bin/" .. outputdir)
 objdir("build/" .. outputdir)
+removedefines "HAS_GLM"
 
 files {
    "src/**.cpp",

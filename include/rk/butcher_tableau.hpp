@@ -1,13 +1,13 @@
 #ifndef BUTCHER_TABLEAU_HPP
 #define BUTCHER_TABLEAU_HPP
 
-#include "ini/serializable.hpp"
 #include <vector>
 #include <cstdint>
+#include <yaml-cpp/yaml.h>
 
 namespace rk
 {
-    class butcher_tableau : public ini::serializable
+    class butcher_tableau
     {
     private:
     public:
@@ -16,18 +16,15 @@ namespace rk
         butcher_tableau(const std::vector<float> &alpha,
                         const std::vector<std::vector<float>> &beta,
                         const std::vector<float> &coefs,
-                        std::uint8_t stage,
-                        std::uint8_t order);
+                        std::uint16_t stage,
+                        std::uint16_t order);
 
         butcher_tableau(const std::vector<float> &alpha,
                         const std::vector<std::vector<float>> &beta,
                         const std::vector<float> &coefs1,
                         const std::vector<float> &coefs2,
-                        std::uint8_t stage,
-                        std::uint8_t order);
-
-        void serialize(ini::serializer &out) const override;
-        void deserialize(ini::deserializer &in) override;
+                        std::uint16_t stage,
+                        std::uint16_t order);
 
         const std::vector<float> &alpha() const;
         const std::vector<std::vector<float>> &beta() const;
@@ -35,15 +32,30 @@ namespace rk
         const std::vector<float> &coefs1() const;
         const std::vector<float> &coefs2() const;
         bool embedded() const;
-        std::uint8_t stage() const;
-        std::uint8_t order() const;
+        std::uint16_t stage() const;
+        std::uint16_t order() const;
 
     private:
         std::vector<float> m_alpha, m_coefs1, m_coefs2;
         std::vector<std::vector<float>> m_beta;
         bool m_embedded;
-        std::uint8_t m_stage, m_order;
+        std::uint16_t m_stage, m_order;
     };
+
+#ifdef HAS_YAML_CPP
+    YAML::Emitter &operator<<(YAML::Emitter &out, const butcher_tableau &bb);
+#endif
 }
 
+#ifdef HAS_YAML_CPP
+namespace YAML
+{
+    template <>
+    struct convert<rk::butcher_tableau>
+    {
+        static Node encode(const rk::butcher_tableau &bb);
+        static bool decode(const Node &node, rk::butcher_tableau &bb);
+    };
+}
+#endif
 #endif
