@@ -43,7 +43,7 @@ namespace rk
     };
 
 #ifdef HAS_YAML_CPP
-    YAML::Emitter &operator<<(YAML::Emitter &out, const butcher_tableau &bb);
+    YAML::Emitter &operator<<(YAML::Emitter &out, const butcher_tableau &bt);
 #endif
 }
 
@@ -53,8 +53,8 @@ namespace YAML
     template <>
     struct convert<rk::butcher_tableau>
     {
-        static Node encode(const rk::butcher_tableau &bb);
-        static bool decode(const Node &node, rk::butcher_tableau &bb);
+        static Node encode(const rk::butcher_tableau &bt);
+        static bool decode(const Node &node, rk::butcher_tableau &bt);
     };
 }
 #endif
