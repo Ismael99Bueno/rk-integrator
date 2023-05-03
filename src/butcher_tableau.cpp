@@ -68,7 +68,7 @@ namespace YAML
     {
         Node node;
         node["alpha"] = bt.alpha();
-        node["coefs1"] = bt.coefs1();
+        node[bt.embedded() ? "coefs1" : "coefs"] = bt.coefs1();
         if (bt.embedded())
             node["coefs2"] = bt.coefs2();
 
@@ -100,10 +100,11 @@ namespace YAML
         }
         for (const auto &n : node["alpha"])
             alpha.push_back(n.as<float>());
-        for (const auto &n : node["coefs1"])
-            coefs1.push_back(n.as<float>());
+
         if (node["coefs2"])
         {
+            for (const auto &n : node["coefs1"])
+                coefs1.push_back(n.as<float>());
             for (const auto &n : node["coefs2"])
                 coefs2.push_back(n.as<float>());
             bt = {alpha,
@@ -114,6 +115,8 @@ namespace YAML
                   node["order"].as<std::uint16_t>()};
             return true;
         }
+        for (const auto &n : node["coefs"])
+            coefs1.push_back(n.as<float>());
         bt = {alpha,
               beta,
               coefs1,
