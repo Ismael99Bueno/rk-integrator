@@ -46,7 +46,7 @@ namespace rk
     {
         out << YAML::BeginMap;
         out << YAML::Key << "alpha" << YAML::Value << YAML::Flow << bt.alpha();
-        out << YAML::Key << "coefs1" << YAML::Value << YAML::Flow << bt.coefs1();
+        out << YAML::Key << (bt.embedded() ? "coefs1" : "coefs") << YAML::Value << YAML::Flow << bt.coefs1();
         if (bt.embedded())
             out << YAML::Key << "coefs2" << YAML::Value << YAML::Flow << bt.coefs2();
         out << YAML::Key << "beta" << YAML::Value << YAML::BeginSeq;

@@ -37,7 +37,7 @@ namespace rk
 
         friend class integrator;
 #ifdef HAS_YAML_CPP
-        friend YAML::Emitter &operator<<(YAML::Emitter &out, const state &st);
+        friend YAML::Emitter &operator<<(YAML::Emitter &, const state &);
         friend struct YAML::convert<state>;
 #endif
     };

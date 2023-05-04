@@ -197,7 +197,7 @@ namespace rk
             }
         }
 #ifdef HAS_YAML_CPP
-        friend YAML::Emitter &operator<<(YAML::Emitter &out, const integrator &st);
+        friend YAML::Emitter &operator<<(YAML::Emitter &, const integrator &);
         friend struct YAML::convert<integrator>;
 #endif
     };
