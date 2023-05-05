@@ -53,8 +53,8 @@ namespace rk
         for (const auto &vec : bt.beta())
             out << YAML::Flow << vec;
         out << YAML::EndSeq;
-        out << YAML::Key << "stage" << YAML::Value << bt.stage();
-        out << YAML::Key << "order" << YAML::Value << bt.order();
+        out << YAML::Key << "Stage" << YAML::Value << bt.stage();
+        out << YAML::Key << "Order" << YAML::Value << bt.order();
         out << YAML::EndMap;
         return out;
     }
@@ -111,8 +111,8 @@ namespace YAML
                   beta,
                   coefs1,
                   coefs2,
-                  node["stage"].as<std::uint16_t>(),
-                  node["order"].as<std::uint16_t>()};
+                  node["Stage"].as<std::uint16_t>(),
+                  node["Order"].as<std::uint16_t>()};
             return true;
         }
         for (const auto &n : node["coefs"])
@@ -120,8 +120,8 @@ namespace YAML
         bt = {alpha,
               beta,
               coefs1,
-              node["stage"].as<std::uint16_t>(),
-              node["order"].as<std::uint16_t>()};
+              node["Stage"].as<std::uint16_t>(),
+              node["Order"].as<std::uint16_t>()};
         return true;
     };
 }

@@ -73,9 +73,9 @@ namespace rk
     YAML::Emitter &operator<<(YAML::Emitter &out, const state &st)
     {
         out << YAML::BeginMap;
-        out << YAML::Key << "vars" << YAML::Value << YAML::Flow << st.vars();
-        out << YAML::Key << "step" << YAML::Value << YAML::Flow << st.step();
-        out << YAML::Key << "k_vec" << YAML::Value << YAML::BeginSeq;
+        out << YAML::Key << "State variables" << YAML::Value << YAML::Flow << st.vars();
+        out << YAML::Key << "Step" << YAML::Value << YAML::Flow << st.step();
+        out << YAML::Key << "K-Vectors" << YAML::Value << YAML::BeginSeq;
         for (const auto &v : st.m_kvec)
             out << YAML::Flow << v;
         out << YAML::EndSeq << YAML::EndMap;
@@ -90,16 +90,16 @@ namespace YAML
     Node convert<rk::state>::encode(const rk::state &st)
     {
         Node node;
-        node["vars"] = st.vars();
-        node["step"] = st.step();
-        node["vars"].SetStyle(YAML::EmitterStyle::Flow);
-        node["step"].SetStyle(YAML::EmitterStyle::Flow);
+        node["State variables"] = st.vars();
+        node["Step"] = st.step();
+        node["State variables"].SetStyle(YAML::EmitterStyle::Flow);
+        node["Step"].SetStyle(YAML::EmitterStyle::Flow);
         for (const auto &v : st.m_kvec)
         {
             Node child;
             child = v;
             child.SetStyle(YAML::EmitterStyle::Flow);
-            node["k_vec"].push_back(v);
+            node["K-Vectors"].push_back(v);
         }
         return node;
     }
@@ -110,15 +110,15 @@ namespace YAML
 
         std::vector<float> vars, step;
         std::vector<std::vector<float>> k_vec;
-        for (const auto &n1 : node["k_vec"])
+        for (const auto &n1 : node["K-Vectors"])
         {
             auto &v1 = k_vec.emplace_back();
             for (const auto &n2 : n1)
                 v1.push_back(n2.as<float>());
         }
-        for (const auto &n : node["vars"])
+        for (const auto &n : node["State variables"])
             vars.push_back(n.as<float>());
-        for (const auto &n : node["step"])
+        for (const auto &n : node["Step"])
             step.push_back(n.as<float>());
         st.m_vars = vars;
         st.m_step = step;
