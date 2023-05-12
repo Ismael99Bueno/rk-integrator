@@ -2,7 +2,7 @@
 #define INTEGRATOR_HPP
 
 #include "rk/butcher_tableau.hpp"
-#include "debug/debug.hpp"
+#include "dbg/log.hpp"
 #include "perf/perf.hpp"
 #include "rk/state.hpp"
 #include <cstdint>

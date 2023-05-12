@@ -1,6 +1,6 @@
 #include "rk/pch.hpp"
 #include "rk/butcher_tableau.hpp"
-#include "debug/debug.hpp"
+#include "dbg/log.hpp"
 
 namespace rk
 {
