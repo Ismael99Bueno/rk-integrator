@@ -22,8 +22,6 @@ namespace rk
         float &operator[](std::size_t index);
 
         const std::vector<float> &vars() const;
-        const std::vector<float> &step() const;
-
         void vars(const std::vector<float> &vars);
 
         std::size_t size() const;
@@ -32,7 +30,7 @@ namespace rk
         void resize();
         void resize_kvec(std::uint16_t stage);
 
-        std::vector<float> m_vars, m_step;
+        std::vector<float> m_vars;
         std::vector<std::vector<float>> m_kvec;
 
         friend class integrator;

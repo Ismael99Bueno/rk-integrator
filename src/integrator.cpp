@@ -31,9 +31,7 @@ namespace rk
                 sum += coefs[i] * m_state.m_kvec[i][j];
             m_valid &= !std::isnan(sum);
 
-            const float step = sum * dt;
-            m_state.m_step[j] = step;
-            sol.push_back(vars[j] + step);
+            sol.push_back(vars[j] + sum * dt);
         }
         return sol;
     }

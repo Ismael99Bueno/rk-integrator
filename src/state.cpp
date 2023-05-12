@@ -41,7 +41,6 @@ namespace rk
     void state::clear()
     {
         m_vars.clear();
-        m_step.clear();
         for (std::vector<float> &v : m_kvec)
             v.clear();
     }
@@ -50,7 +49,6 @@ namespace rk
     {
         for (std::vector<float> &v : m_kvec)
             v.resize(m_vars.size());
-        m_step.resize(m_vars.size());
     }
 
     void state::resize_kvec(const std::uint16_t stage)
@@ -60,7 +58,6 @@ namespace rk
     }
 
     const std::vector<float> &state::vars() const { return m_vars; }
-    const std::vector<float> &state::step() const { return m_step; }
 
     void state::vars(const std::vector<float> &vars)
     {
@@ -74,7 +71,6 @@ namespace rk
     {
         out << YAML::BeginMap;
         out << YAML::Key << "State variables" << YAML::Value << YAML::Flow << st.vars();
-        out << YAML::Key << "Step" << YAML::Value << YAML::Flow << st.step();
         out << YAML::Key << "K-Vectors" << YAML::Value << YAML::BeginSeq;
         for (const auto &v : st.m_kvec)
             out << YAML::Flow << v;
@@ -91,7 +87,6 @@ namespace YAML
     {
         Node node;
         node["State variables"] = st.vars();
-        node["Step"] = st.step();
         node["State variables"].SetStyle(YAML::EmitterStyle::Flow);
         node["Step"].SetStyle(YAML::EmitterStyle::Flow);
         for (const auto &v : st.m_kvec)
@@ -105,10 +100,10 @@ namespace YAML
     }
     bool convert<rk::state>::decode(const Node &node, rk::state &st)
     {
-        if (!node.IsMap() || node.size() != 3)
+        if (!node.IsMap() || node.size() != 2)
             return false;
 
-        std::vector<float> vars, step;
+        std::vector<float> vars;
         std::vector<std::vector<float>> k_vec;
         for (const auto &n1 : node["K-Vectors"])
         {
@@ -118,10 +113,7 @@ namespace YAML
         }
         for (const auto &n : node["State variables"])
             vars.push_back(n.as<float>());
-        for (const auto &n : node["Step"])
-            step.push_back(n.as<float>());
         st.m_vars = vars;
-        st.m_step = step;
         st.m_kvec = k_vec;
 
         return true;
