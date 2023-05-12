@@ -34,7 +34,7 @@ namespace rk
     const std::vector<float> &butcher_tableau::coefs1() const { return m_coefs1; }
     const std::vector<float> &butcher_tableau::coefs2() const
     {
-        DBG_ASSERT(m_embedded, "Cannot access to the second set of coefficients if the tableau is not embedded")
+        DBG_ASSERT_ERROR(m_embedded, "Cannot access to the second set of coefficients if the tableau is not embedded")
         return m_coefs2;
     }
     bool butcher_tableau::embedded() const { return m_embedded; }

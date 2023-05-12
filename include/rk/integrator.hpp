@@ -30,7 +30,7 @@ namespace rk
                          std::vector<float> (*ode)(float, const std::vector<float> &, T &))
         {
             PERF_SCOPE("-Physics-")
-            DBG_ASSERT(!dt_off_bounds(dt), "Timestep is not between established limits. Change the timestep or adjust the limits to include the current value - current: %f, min: %f, max: %f\n", dt, m_min_dt, m_max_dt)
+            DBG_ASSERT_ERROR(!dt_off_bounds(dt), "Timestep is not between established limits. Change the timestep or adjust the limits to include the current value - current: {0}, min: {1}, max: {2}", dt, m_min_dt, m_max_dt)
             m_valid = true;
             const float sdt = m_reversed ? -dt : dt;
 
@@ -45,7 +45,7 @@ namespace rk
             else
                 vars = generate_solution(sdt, vars, m_tableau.coefs());
             t += sdt;
-            DBG_LOG_IF(!m_valid, "NaN encountered when computing runge-kutta solution.\n")
+            DBG_ASSERT_WARN(!m_valid, "NaN encountered when computing runge-kutta solution.")
             return m_valid;
         }
 
@@ -57,9 +57,9 @@ namespace rk
                                  std::uint8_t reiterations = 2)
         {
             PERF_SCOPE("-Physics-")
-            DBG_ASSERT(reiterations >= 2, "The amount of reiterations has to be greater than 1, otherwise the algorithm will break.\n")
-            DBG_ASSERT(!dt_off_bounds(dt), "Timestep is not between established limits. Change the timestep or adjust the limits to include the vars value - vars: %f, min: %f, max: %f\n", dt, m_min_dt, m_max_dt)
-            DBG_LOG_IF(m_tableau.embedded(), "Butcher tableau has an embedded solution. Use an embedded adaptive method for better efficiency.\n")
+            DBG_ASSERT_CRITICAL(reiterations >= 2, "The amount of reiterations has to be greater than 1, otherwise the algorithm will break.")
+            DBG_ASSERT_ERROR(!dt_off_bounds(dt), "Timestep is not between established limits. Change the timestep or adjust the limits to include the current value - current: {0}, min: {1}, max: {2}", dt, m_min_dt, m_max_dt)
+            DBG_ASSERT_WARN(!m_tableau.embedded(), "Butcher tableau has an embedded solution. Use an embedded adaptive method for better efficiency.")
 
             m_valid = true;
             if (m_error > 0.f)
@@ -91,7 +91,7 @@ namespace rk
             }
             m_error = std::max(m_error, m_tolerance / TOL_PART);
             t += m_reversed ? -dt : dt;
-            DBG_LOG_IF(!m_valid, "NaN encountered when computing runge-kutta solution.\n")
+            DBG_ASSERT_WARN(m_valid, "NaN encountered when computing runge-kutta solution.")
             return m_valid;
         }
 
@@ -102,8 +102,8 @@ namespace rk
                               std::vector<float> (*ode)(float, const std::vector<float> &, T &))
         {
             PERF_SCOPE("-Physics-")
-            DBG_ASSERT(m_tableau.embedded(), "Cannot perform embedded adaptive stepsize without an embedded solution.\n")
-            DBG_ASSERT(!dt_off_bounds(dt), "Timestep is not between established limits. Change the timestep or adjust the limits to include the vars value - vars: %f, min: %f, max: %f\n", dt, m_min_dt, m_max_dt)
+            DBG_ASSERT_CRITICAL(m_tableau.embedded(), "Cannot perform embedded adaptive stepsize without an embedded solution.")
+            DBG_ASSERT_ERROR(!dt_off_bounds(dt), "Timestep is not between established limits. Change the timestep or adjust the limits to include the vars value - vars: {0}, min: {1}, max: {2}", dt, m_min_dt, m_max_dt)
             m_valid = true;
 
             if (m_error > 0.f)
@@ -129,7 +129,7 @@ namespace rk
             }
             m_error = std::max(m_error, m_tolerance / TOL_PART);
             t += m_reversed ? -dt : dt;
-            DBG_LOG_IF(!m_valid, "NaN encountered when computing runge-kutta solution.\n")
+            DBG_ASSERT_WARN(m_valid, "NaN encountered when computing runge-kutta solution.")
             return m_valid;
         }
 
@@ -180,7 +180,7 @@ namespace rk
         {
             PERF_FUNCTION()
             auto &kvec = m_state.m_kvec;
-            DBG_ASSERT(vars.size() == kvec[0].size(), "State and k-vectors size mismatch! - vars size: %zu, k-vectors size: %zu\n", vars.size(), kvec[0].size())
+            DBG_ASSERT_CRITICAL(vars.size() == kvec[0].size(), "State and k-vectors size mismatch! - vars size: {0}, k-vectors size: {1}", vars.size(), kvec[0].size())
             std::vector<float> aux_vars(vars.size());
 
             kvec[0] = ode(t, vars, params);
