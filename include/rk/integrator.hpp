@@ -45,7 +45,7 @@ namespace rk
             else
                 vars = generate_solution(sdt, vars, m_tableau.coefs());
             t += sdt;
-            DBG_ASSERT_WARN(!m_valid, "NaN encountered when computing runge-kutta solution.")
+            DBG_ASSERT_WARN(m_valid, "NaN encountered when computing runge-kutta solution.")
             return m_valid;
         }
 
