@@ -3,7 +3,9 @@
 
 #include <vector>
 #include <cstdint>
+#ifdef HAS_YAML_CPP
 #include <yaml-cpp/yaml.h>
+#endif
 
 namespace rk
 {
