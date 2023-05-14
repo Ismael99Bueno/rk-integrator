@@ -23,11 +23,8 @@ namespace rk
                    float min_dt = 1e-6f,
                    float max_dt = 1.f);
 
-        template <typename T>
-        bool raw_forward(float &t,
-                         float dt,
-                         T &params,
-                         std::vector<float> (*ode)(float, const std::vector<float> &, T &))
+        template <typename ODE>
+        bool raw_forward(float &t, float dt, ODE &ode)
         {
             PERF_SCOPE("-Physics-")
             DBG_ASSERT_ERROR(!dt_off_bounds(dt), "Timestep is not between established limits. Change the timestep or adjust the limits to include the current value - current: {0}, min: {1}, max: {2}", dt, m_min_dt, m_max_dt)
@@ -35,7 +32,7 @@ namespace rk
             const float sdt = m_reversed ? -dt : dt;
 
             std::vector<float> &vars = m_state.m_vars;
-            update_kvec(t, sdt, vars, params, ode);
+            update_kvec(t, sdt, vars, ode);
             if (m_tableau.embedded())
             {
                 const std::vector<float> aux_state = generate_solution(sdt, vars, m_tableau.coefs2());
@@ -49,12 +46,8 @@ namespace rk
             return m_valid;
         }
 
-        template <typename T>
-        bool reiterative_forward(float &t,
-                                 float &dt,
-                                 T &params,
-                                 std::vector<float> (*ode)(float, const std::vector<float> &, T &),
-                                 std::uint8_t reiterations = 2)
+        template <typename ODE>
+        bool reiterative_forward(float &t, float &dt, ODE &ode, std::uint8_t reiterations = 2)
         {
             PERF_SCOPE("-Physics-")
             DBG_ASSERT_CRITICAL(reiterations >= 2, "The amount of reiterations has to be greater than 1, otherwise the algorithm will break.")
@@ -69,12 +62,12 @@ namespace rk
                 const float sdt = m_reversed ? -dt : dt;
                 std::vector<float> &vars = m_state.m_vars;
                 std::vector<float> sol1 = vars;
-                update_kvec(t, sdt, vars, params, ode);
+                update_kvec(t, sdt, vars, ode);
 
                 const std::vector<float> sol2 = generate_solution(sdt, vars, m_tableau.coefs());
                 for (std::uint8_t i = 0; i < reiterations; i++)
                 {
-                    update_kvec(t, sdt / reiterations, sol1, params, ode);
+                    update_kvec(t, sdt / reiterations, sol1, ode);
                     sol1 = generate_solution(sdt / reiterations, sol1, m_tableau.coefs());
                 }
                 m_error = reiterative_error(sol1, sol2);
@@ -95,11 +88,8 @@ namespace rk
             return m_valid;
         }
 
-        template <typename T>
-        bool embedded_forward(float &t,
-                              float &dt,
-                              T &params,
-                              std::vector<float> (*ode)(float, const std::vector<float> &, T &))
+        template <typename ODE>
+        bool embedded_forward(float &t, float &dt, ODE &ode)
         {
             PERF_SCOPE("-Physics-")
             DBG_ASSERT_CRITICAL(m_tableau.embedded(), "Cannot perform embedded adaptive stepsize without an embedded solution.")
@@ -112,7 +102,7 @@ namespace rk
             {
                 const float sdt = m_reversed ? -dt : dt;
                 std::vector<float> &vars = m_state.m_vars;
-                update_kvec(t, sdt, vars, params, ode);
+                update_kvec(t, sdt, vars, ode);
                 const std::vector<float> sol2 = generate_solution(sdt, vars, m_tableau.coefs2());
                 const std::vector<float> sol1 = generate_solution(sdt, vars, m_tableau.coefs1());
                 m_error = embedded_error(sol1, sol2);
@@ -171,19 +161,15 @@ namespace rk
         float reiterative_error(const std::vector<float> &sol1, const std::vector<float> &sol2) const;
         float timestep_factor() const;
 
-        template <typename T>
-        void update_kvec(float t,
-                         float dt,
-                         const std::vector<float> &vars,
-                         T &params,
-                         std::vector<float> (*ode)(float, const std::vector<float> &, T &))
+        template <typename ODE>
+        void update_kvec(float t, float dt, const std::vector<float> &vars, ODE &ode)
         {
             PERF_FUNCTION()
             auto &kvec = m_state.m_kvec;
             DBG_ASSERT_CRITICAL(vars.size() == kvec[0].size(), "State and k-vectors size mismatch! - vars size: {0}, k-vectors size: {1}", vars.size(), kvec[0].size())
             std::vector<float> aux_vars(vars.size());
 
-            kvec[0] = ode(t, vars, params);
+            kvec[0] = ode(t, dt, vars);
             for (std::uint8_t i = 1; i < m_tableau.stage(); i++)
             {
                 for (std::size_t j = 0; j < vars.size(); j++)
@@ -193,7 +179,7 @@ namespace rk
                         k_sum += m_tableau.beta()[i - 1][k] * kvec[k][j];
                     aux_vars[j] = vars[j] + k_sum * dt;
                 }
-                kvec[i] = ode(t + m_tableau.alpha()[i - 1] * dt, aux_vars, params);
+                kvec[i] = ode(t + m_tableau.alpha()[i - 1] * dt, dt, aux_vars);
             }
         }
 #ifdef HAS_YAML_CPP
