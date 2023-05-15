@@ -1,6 +1,7 @@
 #ifndef BUTCHER_TABLEAU_HPP
 #define BUTCHER_TABLEAU_HPP
 
+#include "rk/core.hpp"
 #include <vector>
 #include <cstdint>
 #ifdef HAS_YAML_CPP

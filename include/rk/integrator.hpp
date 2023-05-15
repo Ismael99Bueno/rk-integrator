@@ -1,8 +1,8 @@
 #ifndef INTEGRATOR_HPP
 #define INTEGRATOR_HPP
 
+#include "rk/core.hpp"
 #include "rk/butcher_tableau.hpp"
-
 #include "rk/state.hpp"
 #include <cstdint>
 #include <cmath>

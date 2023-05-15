@@ -2,6 +2,9 @@
 #define STATE_HPP
 
 #include <vector>
+#ifdef HAS_YAML_CPP
+#include <yaml-cpp/yaml.h>
+#endif
 
 namespace rk
 {

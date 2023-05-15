@@ -13,5 +13,6 @@
 #ifdef HAS_PROFILE_TOOLS
 #include "perf/perf.hpp"
 #endif
+#include "rk/core.hpp"
 
 #endif
