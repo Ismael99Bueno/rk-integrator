@@ -37,14 +37,15 @@
 #ifdef HAS_ALLOCATORS
 #include "mem/stack_allocator.hpp"
 #include "mem/block_allocator.hpp"
+#include <vector>
 
 namespace rk
 {
     template <typename T>
-    using stack_alloc = mem::stack_allocator<T>;
+    using stk_vector = std::vector<T, mem::stack_allocator<T>>;
 
     template <typename T>
-    using block_alloc = mem::block_allocator<T>;
+    using blk_vector = std::vector<T, mem::block_allocator<T>>;
 }
 #else
 
@@ -52,10 +53,10 @@ namespace rk
 namespace rk
 {
     template <typename T>
-    using stack_alloc = std::allocator<T>;
+    using stk_vector = std::vector<T>;
 
     template <typename T>
-    using block_alloc = std::allocator<T>;
+    using blk_vector = std::vector<T>;
 }
 
 #endif
