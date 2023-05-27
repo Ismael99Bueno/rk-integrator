@@ -41,23 +41,19 @@
 
 namespace rk
 {
-    template <typename T>
-    using stk_vector = std::vector<T, mem::stack_allocator<T>>;
+template <typename T> using stk_vector = std::vector<T, mem::stack_allocator<T>>;
 
-    template <typename T>
-    using blk_vector = std::vector<T, mem::block_allocator<T>>;
-}
+template <typename T> using blk_vector = std::vector<T, mem::block_allocator<T>>;
+} // namespace rk
 #else
 
 #include <memory>
 namespace rk
 {
-    template <typename T>
-    using stk_vector = std::vector<T>;
+template <typename T> using stk_vector = std::vector<T>;
 
-    template <typename T>
-    using blk_vector = std::vector<T>;
-}
+template <typename T> using blk_vector = std::vector<T>;
+} // namespace rk
 
 #endif
 
