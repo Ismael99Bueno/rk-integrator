@@ -34,27 +34,4 @@
 #define PERF_SET_EXTENSION(...)
 #endif
 
-#ifdef HAS_ALLOCATORS
-#include "mem/stack_allocator.hpp"
-#include "mem/block_allocator.hpp"
-#include <vector>
-
-namespace rk
-{
-template <typename T> using stk_vector = std::vector<T, mem::stack_allocator<T>>;
-
-template <typename T> using blk_vector = std::vector<T, mem::block_allocator<T>>;
-} // namespace rk
-#else
-
-#include <memory>
-namespace rk
-{
-template <typename T> using stk_vector = std::vector<T>;
-
-template <typename T> using blk_vector = std::vector<T>;
-} // namespace rk
-
-#endif
-
 #endif
