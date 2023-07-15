@@ -21,7 +21,7 @@ class integrator
     template <typename ODE> bool raw_forward(float &t, float dt, ODE &ode)
     {
         PERF_SCOPE("-Physics-")
-        DBG_ASSERT_ERROR(!dt_off_bounds(dt),
+        KIT_ASSERT_ERROR(!dt_off_bounds(dt),
                          "Timestep is not between established limits. Change the timestep or adjust the limits to "
                          "include the current value - current: {0}, min: {1}, max: {2}",
                          dt, m_min_dt, m_max_dt)
@@ -39,20 +39,20 @@ class integrator
         else
             vars = generate_solution(sdt, vars, m_tableau.coefs());
         t += sdt;
-        DBG_ASSERT_WARN(m_valid, "NaN encountered when computing runge-kutta solution.")
+        KIT_ASSERT_WARN(m_valid, "NaN encountered when computing runge-kutta solution.")
         return m_valid;
     }
 
     template <typename ODE> bool reiterative_forward(float &t, float &dt, ODE &ode, std::uint8_t reiterations = 2)
     {
         PERF_SCOPE("-Physics-")
-        DBG_ASSERT_CRITICAL(reiterations >= 2,
+        KIT_ASSERT_CRITICAL(reiterations >= 2,
                             "The amount of reiterations has to be greater than 1, otherwise the algorithm will break.")
-        DBG_ASSERT_ERROR(!dt_off_bounds(dt),
+        KIT_ASSERT_ERROR(!dt_off_bounds(dt),
                          "Timestep is not between established limits. Change the timestep or adjust the limits to "
                          "include the current value - current: {0}, min: {1}, max: {2}",
                          dt, m_min_dt, m_max_dt)
-        DBG_ASSERT_WARN(
+        KIT_ASSERT_WARN(
             !m_tableau.embedded(),
             "Butcher tableau has an embedded solution. Use an embedded adaptive method for better efficiency.")
 
@@ -86,16 +86,16 @@ class integrator
         }
         m_error = std::max(m_error, m_tolerance / TOL_PART);
         t += m_reversed ? -dt : dt;
-        DBG_ASSERT_WARN(m_valid, "NaN encountered when computing runge-kutta solution.")
+        KIT_ASSERT_WARN(m_valid, "NaN encountered when computing runge-kutta solution.")
         return m_valid;
     }
 
     template <typename ODE> bool embedded_forward(float &t, float &dt, ODE &ode)
     {
         PERF_SCOPE("-Physics-")
-        DBG_ASSERT_CRITICAL(m_tableau.embedded(),
+        KIT_ASSERT_CRITICAL(m_tableau.embedded(),
                             "Cannot perform embedded adaptive stepsize without an embedded solution.")
-        DBG_ASSERT_ERROR(!dt_off_bounds(dt),
+        KIT_ASSERT_ERROR(!dt_off_bounds(dt),
                          "Timestep is not between established limits. Change the timestep or adjust the limits to "
                          "include the vars value - vars: {0}, min: {1}, max: {2}",
                          dt, m_min_dt, m_max_dt)
@@ -124,7 +124,7 @@ class integrator
         }
         m_error = std::max(m_error, m_tolerance / TOL_PART);
         t += m_reversed ? -dt : dt;
-        DBG_ASSERT_WARN(m_valid, "NaN encountered when computing runge-kutta solution.")
+        KIT_ASSERT_WARN(m_valid, "NaN encountered when computing runge-kutta solution.")
         return m_valid;
     }
 
@@ -168,7 +168,7 @@ class integrator
     {
         PERF_FUNCTION()
         auto &kvec = m_state.m_kvec;
-        DBG_ASSERT_CRITICAL(vars.size() == kvec[0].size(),
+        KIT_ASSERT_CRITICAL(vars.size() == kvec[0].size(),
                             "State and k-vectors size mismatch! - vars size: {0}, k-vectors size: {1}", vars.size(),
                             kvec[0].size())
         std::vector<float> aux_vars(vars.size());

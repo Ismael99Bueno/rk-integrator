@@ -34,7 +34,7 @@ const std::vector<float> &butcher_tableau::coefs1() const
 }
 const std::vector<float> &butcher_tableau::coefs2() const
 {
-    DBG_ASSERT_ERROR(m_embedded, "Cannot access to the second set of coefficients if the tableau is not embedded")
+    KIT_ASSERT_ERROR(m_embedded, "Cannot access to the second set of coefficients if the tableau is not embedded")
     return m_coefs2;
 }
 bool butcher_tableau::embedded() const
