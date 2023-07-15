@@ -15,7 +15,7 @@ integrator::integrator(const butcher_tableau &tb, const std::vector<float> &vars
 std::vector<float> integrator::generate_solution(const float dt, const std::vector<float> &vars,
                                                  const std::vector<float> &coefs)
 {
-    PERF_FUNCTION()
+    KIT_PERF_FUNCTION()
     std::vector<float> sol;
     sol.reserve(vars.size());
     for (std::size_t j = 0; j < vars.size(); j++)

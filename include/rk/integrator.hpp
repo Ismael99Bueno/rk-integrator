@@ -20,7 +20,7 @@ class integrator
 
     template <typename ODE> bool raw_forward(float &t, float dt, ODE &ode)
     {
-        PERF_SCOPE("-Physics-")
+        KIT_PERF_SCOPE("-Physics-")
         KIT_ASSERT_ERROR(!dt_off_bounds(dt),
                          "Timestep is not between established limits. Change the timestep or adjust the limits to "
                          "include the current value - current: {0}, min: {1}, max: {2}",
@@ -45,7 +45,7 @@ class integrator
 
     template <typename ODE> bool reiterative_forward(float &t, float &dt, ODE &ode, std::uint8_t reiterations = 2)
     {
-        PERF_SCOPE("-Physics-")
+        KIT_PERF_SCOPE("-Physics-")
         KIT_ASSERT_CRITICAL(reiterations >= 2,
                             "The amount of reiterations has to be greater than 1, otherwise the algorithm will break.")
         KIT_ASSERT_ERROR(!dt_off_bounds(dt),
@@ -92,7 +92,7 @@ class integrator
 
     template <typename ODE> bool embedded_forward(float &t, float &dt, ODE &ode)
     {
-        PERF_SCOPE("-Physics-")
+        KIT_PERF_SCOPE("-Physics-")
         KIT_ASSERT_CRITICAL(m_tableau.embedded(),
                             "Cannot perform embedded adaptive stepsize without an embedded solution.")
         KIT_ASSERT_ERROR(!dt_off_bounds(dt),
@@ -166,7 +166,7 @@ class integrator
 
     template <typename ODE> void update_kvec(float t, float dt, const std::vector<float> &vars, ODE &ode)
     {
-        PERF_FUNCTION()
+        KIT_PERF_FUNCTION()
         auto &kvec = m_state.m_kvec;
         KIT_ASSERT_CRITICAL(vars.size() == kvec[0].size(),
                             "State and k-vectors size mismatch! - vars size: {0}, k-vectors size: {1}", vars.size(),
