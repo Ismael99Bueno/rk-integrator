@@ -1,7 +1,6 @@
 #ifndef INTEGRATOR_HPP
 #define INTEGRATOR_HPP
 
-#include "rk/core.hpp"
 #include "rk/butcher_tableau.hpp"
 #include "rk/state.hpp"
 #include <cstdint>
@@ -187,18 +186,18 @@ class integrator
             kvec[i] = ode(t + m_tableau.alpha()[i - 1] * dt, dt, aux_vars);
         }
     }
-#ifdef HAS_YAML_CPP
+#ifdef YAML_CPP_COMPAT
     friend YAML::Emitter &operator<<(YAML::Emitter &, const integrator &);
     friend struct YAML::convert<integrator>;
 #endif
 };
 
-#ifdef HAS_YAML_CPP
+#ifdef YAML_CPP_COMPAT
 YAML::Emitter &operator<<(YAML::Emitter &out, const integrator &integ);
 #endif
 } // namespace rk
 
-#ifdef HAS_YAML_CPP
+#ifdef YAML_CPP_COMPAT
 namespace YAML
 {
 template <> struct convert<rk::integrator>

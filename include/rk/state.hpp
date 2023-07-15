@@ -2,7 +2,7 @@
 #define STATE_HPP
 
 #include <vector>
-#ifdef HAS_YAML_CPP
+#ifdef YAML_CPP_COMPAT
 #include <yaml-cpp/yaml.h>
 #endif
 
@@ -37,17 +37,17 @@ class state
     std::vector<std::vector<float>> m_kvec;
 
     friend class integrator;
-#ifdef HAS_YAML_CPP
+#ifdef YAML_CPP_COMPAT
     friend YAML::Emitter &operator<<(YAML::Emitter &, const state &);
     friend struct YAML::convert<state>;
 #endif
 };
-#ifdef HAS_YAML_CPP
+#ifdef YAML_CPP_COMPAT
 YAML::Emitter &operator<<(YAML::Emitter &out, const state &st);
 #endif
 } // namespace rk
 
-#ifdef HAS_YAML_CPP
+#ifdef YAML_CPP_COMPAT
 namespace YAML
 {
 template <> struct convert<rk::state>

@@ -146,7 +146,7 @@ void integrator::limited_timestep(bool limited_timestep)
     m_limited_timestep = limited_timestep;
 }
 
-#ifdef HAS_YAML_CPP
+#ifdef YAML_CPP_COMPAT
 YAML::Emitter &operator<<(YAML::Emitter &out, const integrator &integ)
 {
     out << YAML::BeginMap;
@@ -163,7 +163,7 @@ YAML::Emitter &operator<<(YAML::Emitter &out, const integrator &integ)
 #endif
 } // namespace rk
 
-#ifdef HAS_YAML_CPP
+#ifdef YAML_CPP_COMPAT
 namespace YAML
 {
 Node convert<rk::integrator>::encode(const rk::integrator &integ)

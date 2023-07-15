@@ -20,7 +20,7 @@ kind "StaticLib"
 
 targetdir("bin/" .. outputdir)
 objdir("build/" .. outputdir)
-removedefines "HAS_GLM"
+removedefines "YAML_CPP_GLM_COMPAT"
 
 files {
    "src/**.cpp",
@@ -29,9 +29,7 @@ files {
 
 includedirs {
    "include",
-   "%{wks.location}/debug-log-tools/include",
-   "%{wks.location}/profile-tools/include",
-   "%{wks.location}/allocators/include",
+   "%{wks.location}/cpp-kit/include",
    "%{wks.location}/vendor/yaml-cpp/include",
    "%{wks.location}/vendor/spdlog/include"
 }

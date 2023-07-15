@@ -1,10 +1,9 @@
 #ifndef BUTCHER_TABLEAU_HPP
 #define BUTCHER_TABLEAU_HPP
 
-#include "rk/core.hpp"
 #include <vector>
 #include <cstdint>
-#ifdef HAS_YAML_CPP
+#ifdef YAML_CPP_COMPAT
 #include <yaml-cpp/yaml.h>
 #endif
 
@@ -39,12 +38,12 @@ class butcher_tableau
     std::uint16_t m_stage, m_order;
 };
 
-#ifdef HAS_YAML_CPP
+#ifdef YAML_CPP_COMPAT
 YAML::Emitter &operator<<(YAML::Emitter &out, const butcher_tableau &bt);
 #endif
 } // namespace rk
 
-#ifdef HAS_YAML_CPP
+#ifdef YAML_CPP_COMPAT
 namespace YAML
 {
 template <> struct convert<rk::butcher_tableau>
