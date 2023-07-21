@@ -186,18 +186,18 @@ class integrator
             kvec[i] = ode(t + m_tableau.alpha()[i - 1] * dt, dt, aux_vars);
         }
     }
-#ifdef YAML_CPP_COMPAT
+#ifdef KIT_USE_YAML_CPP
     friend YAML::Emitter &operator<<(YAML::Emitter &, const integrator &);
     friend struct YAML::convert<integrator>;
 #endif
 };
 
-#ifdef YAML_CPP_COMPAT
+#ifdef KIT_USE_YAML_CPP
 YAML::Emitter &operator<<(YAML::Emitter &out, const integrator &integ);
 #endif
 } // namespace rk
 
-#ifdef YAML_CPP_COMPAT
+#ifdef KIT_USE_YAML_CPP
 namespace YAML
 {
 template <> struct convert<rk::integrator>

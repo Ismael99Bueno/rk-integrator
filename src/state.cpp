@@ -77,7 +77,7 @@ std::size_t state::size() const
 {
     return m_vars.size();
 }
-#ifdef YAML_CPP_COMPAT
+#ifdef KIT_USE_YAML_CPP
 YAML::Emitter &operator<<(YAML::Emitter &out, const state &st)
 {
     out << YAML::BeginMap;
@@ -91,7 +91,7 @@ YAML::Emitter &operator<<(YAML::Emitter &out, const state &st)
 #endif
 } // namespace rk
 
-#ifdef YAML_CPP_COMPAT
+#ifdef KIT_USE_YAML_CPP
 namespace YAML
 {
 Node convert<rk::state>::encode(const rk::state &st)

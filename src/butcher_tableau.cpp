@@ -50,7 +50,7 @@ std::uint16_t butcher_tableau::order() const
     return m_order;
 }
 
-#ifdef YAML_CPP_COMPAT
+#ifdef KIT_USE_YAML_CPP
 YAML::Emitter &operator<<(YAML::Emitter &out, const butcher_tableau &bt)
 {
     out << YAML::BeginMap;
@@ -70,7 +70,7 @@ YAML::Emitter &operator<<(YAML::Emitter &out, const butcher_tableau &bt)
 #endif
 } // namespace rk
 
-#ifdef YAML_CPP_COMPAT
+#ifdef KIT_USE_YAML_CPP
 namespace YAML
 {
 Node convert<rk::butcher_tableau>::encode(const rk::butcher_tableau &bt)
