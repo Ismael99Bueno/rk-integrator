@@ -10,7 +10,7 @@
 
 namespace rk
 {
-class integrator
+class integrator final
 {
   public:
 #ifdef KIT_USE_YAML_CPP
@@ -21,6 +21,7 @@ class integrator
         bool decode(const YAML::Node &node, integrator &tb) const override;
     };
 #endif
+
     integrator() = default;
     integrator(const butcher_tableau &tb, const std::vector<float> &vars = {}, float tolerance = 1e-4f,
                float min_dt = 1e-6f, float max_dt = 1.f);
