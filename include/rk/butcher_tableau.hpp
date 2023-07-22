@@ -1,20 +1,25 @@
-#ifndef BUTCHER_TABLEAU_HPP
-#define BUTCHER_TABLEAU_HPP
+#ifndef RK_BUTCHER_TABLEAU_HPP
+#define RK_BUTCHER_TABLEAU_HPP
 
 #include <vector>
 #include <cstdint>
-#ifdef KIT_USE_YAML_CPP
-#include <yaml-cpp/yaml.h>
-#endif
+#include "kit/interface/serialization.hpp"
 
 namespace rk
 {
 class butcher_tableau
 {
-  private:
   public:
-    butcher_tableau() = default;
+#ifdef KIT_USE_YAML_CPP
+    class serializer : public kit::serializer<butcher_tableau>
+    {
+      public:
+        YAML::Node encode(const butcher_tableau &tb) const override;
+        bool decode(const YAML::Node &node, butcher_tableau &tb) const override;
+    };
+#endif
 
+    butcher_tableau() = default;
     butcher_tableau(const std::vector<float> &alpha, const std::vector<std::vector<float>> &beta,
                     const std::vector<float> &coefs, std::uint16_t stage, std::uint16_t order);
 
@@ -37,20 +42,6 @@ class butcher_tableau
     bool m_embedded;
     std::uint16_t m_stage, m_order;
 };
-
-#ifdef KIT_USE_YAML_CPP
-YAML::Emitter &operator<<(YAML::Emitter &out, const butcher_tableau &bt);
-#endif
 } // namespace rk
 
-#ifdef KIT_USE_YAML_CPP
-namespace YAML
-{
-template <> struct convert<rk::butcher_tableau>
-{
-    static Node encode(const rk::butcher_tableau &bt);
-    static bool decode(const Node &node, rk::butcher_tableau &bt);
-};
-} // namespace YAML
-#endif
 #endif

@@ -147,28 +147,9 @@ void integrator::limited_timestep(bool limited_timestep)
 }
 
 #ifdef KIT_USE_YAML_CPP
-YAML::Emitter &operator<<(YAML::Emitter &out, const integrator &integ)
+YAML::Node integrator::serializer::encode(const integrator &integ) const
 {
-    out << YAML::BeginMap;
-    out << YAML::Key << "Tableau" << YAML::Value << integ.tableau();
-    out << YAML::Key << "State" << YAML::Value << integ.state();
-    out << YAML::Key << "Tolerance" << YAML::Value << integ.tolerance();
-    out << YAML::Key << "Min timestep" << YAML::Value << integ.min_dt();
-    out << YAML::Key << "Max timestep" << YAML::Value << integ.max_dt();
-    out << YAML::Key << "Reversed" << YAML::Value << integ.reversed();
-    out << YAML::Key << "Limited timestep" << YAML::Value << integ.limited_timestep();
-    out << YAML::EndMap;
-    return out;
-}
-#endif
-} // namespace rk
-
-#ifdef KIT_USE_YAML_CPP
-namespace YAML
-{
-Node convert<rk::integrator>::encode(const rk::integrator &integ)
-{
-    Node node;
+    YAML::Node node;
     node["Tableau"] = integ.tableau();
     node["State"] = integ.state();
     node["Tolerance"] = integ.tolerance();
@@ -178,7 +159,7 @@ Node convert<rk::integrator>::encode(const rk::integrator &integ)
     node["Limited timestep"] = integ.limited_timestep();
     return node;
 }
-bool convert<rk::integrator>::decode(const Node &node, rk::integrator &integ)
+bool integrator::serializer::decode(const YAML::Node &node, integrator &integ) const
 {
     if (!node.IsMap() || node.size() != 7)
         return false;
@@ -191,6 +172,7 @@ bool convert<rk::integrator>::decode(const Node &node, rk::integrator &integ)
     integ.reversed(node["Reversed"].as<bool>());
     integ.limited_timestep(node["Limited timestep"].as<bool>());
     return true;
-};
-} // namespace YAML
+}
 #endif
+
+} // namespace rk

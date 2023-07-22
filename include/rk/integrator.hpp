@@ -1,5 +1,5 @@
-#ifndef INTEGRATOR_HPP
-#define INTEGRATOR_HPP
+#ifndef RK_INTEGRATOR_HPP
+#define RK_INTEGRATOR_HPP
 
 #include "rk/butcher_tableau.hpp"
 #include "rk/state.hpp"
@@ -12,8 +12,15 @@ namespace rk
 {
 class integrator
 {
-  private:
   public:
+#ifdef KIT_USE_YAML_CPP
+    class serializer : public kit::serializer<integrator>
+    {
+      public:
+        YAML::Node encode(const integrator &tb) const override;
+        bool decode(const YAML::Node &node, integrator &tb) const override;
+    };
+#endif
     integrator() = default;
     integrator(const butcher_tableau &tb, const std::vector<float> &vars = {}, float tolerance = 1e-4f,
                float min_dt = 1e-6f, float max_dt = 1.f);
@@ -186,25 +193,8 @@ class integrator
             kvec[i] = ode(t + m_tableau.alpha()[i - 1] * dt, dt, aux_vars);
         }
     }
-#ifdef KIT_USE_YAML_CPP
-    friend YAML::Emitter &operator<<(YAML::Emitter &, const integrator &);
-    friend struct YAML::convert<integrator>;
-#endif
 };
 
-#ifdef KIT_USE_YAML_CPP
-YAML::Emitter &operator<<(YAML::Emitter &out, const integrator &integ);
-#endif
 } // namespace rk
 
-#ifdef KIT_USE_YAML_CPP
-namespace YAML
-{
-template <> struct convert<rk::integrator>
-{
-    static Node encode(const rk::integrator &integ);
-    static bool decode(const Node &node, rk::integrator &integ);
-};
-} // namespace YAML
-#endif
 #endif

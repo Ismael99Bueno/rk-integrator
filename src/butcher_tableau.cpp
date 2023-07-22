@@ -49,80 +49,57 @@ std::uint16_t butcher_tableau::order() const
 {
     return m_order;
 }
-
 #ifdef KIT_USE_YAML_CPP
-YAML::Emitter &operator<<(YAML::Emitter &out, const butcher_tableau &bt)
+YAML::Node butcher_tableau::serializer::encode(const butcher_tableau &tb) const
 {
-    out << YAML::BeginMap;
-    out << YAML::Key << "alpha" << YAML::Value << YAML::Flow << bt.alpha();
-    out << YAML::Key << (bt.embedded() ? "coefs1" : "coefs") << YAML::Value << YAML::Flow << bt.coefs1();
-    if (bt.embedded())
-        out << YAML::Key << "coefs2" << YAML::Value << YAML::Flow << bt.coefs2();
-    out << YAML::Key << "beta" << YAML::Value << YAML::BeginSeq;
-    for (const auto &vec : bt.beta())
-        out << YAML::Flow << vec;
-    out << YAML::EndSeq;
-    out << YAML::Key << "Stage" << YAML::Value << bt.stage();
-    out << YAML::Key << "Order" << YAML::Value << bt.order();
-    out << YAML::EndMap;
-    return out;
-}
-#endif
-} // namespace rk
-
-#ifdef KIT_USE_YAML_CPP
-namespace YAML
-{
-Node convert<rk::butcher_tableau>::encode(const rk::butcher_tableau &bt)
-{
-    Node node;
-    node["alpha"] = bt.alpha();
-    node[bt.embedded() ? "coefs1" : "coefs"] = bt.coefs1();
-    if (bt.embedded())
-        node["coefs2"] = bt.coefs2();
+    YAML::Node node;
+    node["Alpha"] = tb.alpha();
+    node[tb.embedded() ? "Coefs1" : "Coefs"] = tb.coefs1();
+    if (tb.embedded())
+        node["Coefs2"] = tb.coefs2();
 
     for (auto it = node.begin(); it != node.end(); ++it)
         it->second.SetStyle(YAML::EmitterStyle::Flow);
 
-    for (const auto &v : bt.beta())
+    for (const auto &v : tb.beta())
     {
-        Node child;
+        YAML::Node child;
         child = v;
         child.SetStyle(YAML::EmitterStyle::Flow);
-        node["beta"].push_back(v);
+        node["Beta"].push_back(v);
     }
 
     return node;
 }
-bool convert<rk::butcher_tableau>::decode(const Node &node, rk::butcher_tableau &bt)
+bool butcher_tableau::serializer::decode(const YAML::Node &node, butcher_tableau &tb) const
 {
     if (!node.IsMap() || (node.size() != 5 && node.size() != 6))
         return false;
 
     std::vector<float> alpha, coefs1, coefs2;
     std::vector<std::vector<float>> beta;
-    for (const auto &n1 : node["beta"])
+    for (const auto &n1 : node["Beta"])
     {
         auto &v1 = beta.emplace_back();
         for (const auto &n2 : n1)
             v1.push_back(n2.as<float>());
     }
-    for (const auto &n : node["alpha"])
+    for (const auto &n : node["Alpha"])
         alpha.push_back(n.as<float>());
 
-    if (node["coefs2"])
+    if (node["Coefs2"])
     {
-        for (const auto &n : node["coefs1"])
+        for (const auto &n : node["Coefs1"])
             coefs1.push_back(n.as<float>());
-        for (const auto &n : node["coefs2"])
+        for (const auto &n : node["Coefs2"])
             coefs2.push_back(n.as<float>());
-        bt = {alpha, beta, coefs1, coefs2, node["Stage"].as<std::uint16_t>(), node["Order"].as<std::uint16_t>()};
+        tb = {alpha, beta, coefs1, coefs2, node["Stage"].as<std::uint16_t>(), node["Order"].as<std::uint16_t>()};
         return true;
     }
-    for (const auto &n : node["coefs"])
+    for (const auto &n : node["Coefs"])
         coefs1.push_back(n.as<float>());
-    bt = {alpha, beta, coefs1, node["Stage"].as<std::uint16_t>(), node["Order"].as<std::uint16_t>()};
+    tb = {alpha, beta, coefs1, node["Stage"].as<std::uint16_t>(), node["Order"].as<std::uint16_t>()};
     return true;
-};
-} // namespace YAML
+}
 #endif
+} // namespace rk

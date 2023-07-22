@@ -77,39 +77,24 @@ std::size_t state::size() const
 {
     return m_vars.size();
 }
-#ifdef KIT_USE_YAML_CPP
-YAML::Emitter &operator<<(YAML::Emitter &out, const state &st)
-{
-    out << YAML::BeginMap;
-    out << YAML::Key << "State variables" << YAML::Value << YAML::Flow << st.vars();
-    out << YAML::Key << "K-Vectors" << YAML::Value << YAML::BeginSeq;
-    for (const auto &v : st.m_kvec)
-        out << YAML::Flow << v;
-    out << YAML::EndSeq << YAML::EndMap;
-    return out;
-}
-#endif
-} // namespace rk
 
 #ifdef KIT_USE_YAML_CPP
-namespace YAML
+YAML::Node state::serializer::encode(const state &st) const
 {
-Node convert<rk::state>::encode(const rk::state &st)
-{
-    Node node;
+    YAML::Node node;
     node["State variables"] = st.vars();
     node["State variables"].SetStyle(YAML::EmitterStyle::Flow);
     node["Step"].SetStyle(YAML::EmitterStyle::Flow);
     for (const auto &v : st.m_kvec)
     {
-        Node child;
+        YAML::Node child;
         child = v;
         child.SetStyle(YAML::EmitterStyle::Flow);
         node["K-Vectors"].push_back(v);
     }
     return node;
 }
-bool convert<rk::state>::decode(const Node &node, rk::state &st)
+bool state::serializer::decode(const YAML::Node &node, state &st) const
 {
     if (!node.IsMap() || node.size() != 2)
         return false;
@@ -128,6 +113,6 @@ bool convert<rk::state>::decode(const Node &node, rk::state &st)
     st.m_kvec = k_vec;
 
     return true;
-};
-} // namespace YAML
+}
 #endif
+} // namespace rk

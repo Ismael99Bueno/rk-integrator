@@ -1,16 +1,23 @@
-#ifndef STATE_HPP
-#define STATE_HPP
+#ifndef RK_STATE_HPP
+#define RK_STATE_HPP
 
 #include <vector>
-#ifdef KIT_USE_YAML_CPP
-#include <yaml-cpp/yaml.h>
-#endif
+#include "kit/interface/serialization.hpp"
 
 namespace rk
 {
 class state
 {
   public:
+#ifdef KIT_USE_YAML_CPP
+    class serializer : public kit::serializer<state>
+    {
+      public:
+        YAML::Node encode(const state &tb) const override;
+        bool decode(const YAML::Node &node, state &tb) const override;
+    };
+#endif
+
     state() = default;
     state(const std::vector<float> &vars, std::uint16_t stage);
 
@@ -37,24 +44,7 @@ class state
     std::vector<std::vector<float>> m_kvec;
 
     friend class integrator;
-#ifdef KIT_USE_YAML_CPP
-    friend YAML::Emitter &operator<<(YAML::Emitter &, const state &);
-    friend struct YAML::convert<state>;
-#endif
 };
-#ifdef KIT_USE_YAML_CPP
-YAML::Emitter &operator<<(YAML::Emitter &out, const state &st);
-#endif
 } // namespace rk
 
-#ifdef KIT_USE_YAML_CPP
-namespace YAML
-{
-template <> struct convert<rk::state>
-{
-    static Node encode(const rk::state &st);
-    static bool decode(const Node &node, rk::state &st);
-};
-} // namespace YAML
-#endif
 #endif
