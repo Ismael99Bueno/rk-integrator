@@ -84,13 +84,12 @@ YAML::Node state::serializer::encode(const state &st) const
     YAML::Node node;
     node["State variables"] = st.vars();
     node["State variables"].SetStyle(YAML::EmitterStyle::Flow);
-    node["Step"].SetStyle(YAML::EmitterStyle::Flow);
-    for (const auto &v : st.m_kvec)
+    for (std::size_t i = 0; i < st.m_kvec.size(); i++)
     {
         YAML::Node child;
-        child = v;
-        child.SetStyle(YAML::EmitterStyle::Flow);
-        node["K-Vectors"].push_back(v);
+        child = st.m_kvec[i];
+        node["K-Vectors"].push_back(child);
+        node["K-Vectors"][i].SetStyle(YAML::EmitterStyle::Flow);
     }
     return node;
 }

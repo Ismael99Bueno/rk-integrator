@@ -61,13 +61,15 @@ YAML::Node butcher_tableau::serializer::encode(const butcher_tableau &tb) const
     for (auto it = node.begin(); it != node.end(); ++it)
         it->second.SetStyle(YAML::EmitterStyle::Flow);
 
-    for (const auto &v : tb.beta())
+    for (std::size_t i = 0; i < tb.beta().size(); i++)
     {
         YAML::Node child;
-        child = v;
-        child.SetStyle(YAML::EmitterStyle::Flow);
-        node["Beta"].push_back(v);
+        child = tb.beta()[i];
+        node["Beta"].push_back(child);
+        node["Beta"][i].SetStyle(YAML::EmitterStyle::Flow);
     }
+    node["Stage"] = tb.stage();
+    node["Order"] = tb.order();
 
     return node;
 }
