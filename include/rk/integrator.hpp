@@ -3,6 +3,7 @@
 
 #include "rk/butcher_tableau.hpp"
 #include "rk/state.hpp"
+#include "kit/profile/perf.hpp"
 #include <cstdint>
 #include <cmath>
 
