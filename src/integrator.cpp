@@ -6,12 +6,13 @@
 namespace rk
 {
 integrator::integrator(const butcher_tableau &tb, const std::vector<float> &vars, const float tolerance,
-                       const float min_dt, const float max_dt)
-    : state(vars, tb.stage()), tolerance(tolerance), min_dt(min_dt), max_dt(max_dt), m_tableau(tb)
+                       const float min_timestep, const float max_timestep)
+    : state(vars, tb.stage()), tolerance(tolerance), min_timestep(min_timestep), max_timestep(max_timestep),
+      m_tableau(tb)
 {
 }
 
-std::vector<float> integrator::generate_solution(const float dt, const std::vector<float> &vars,
+std::vector<float> integrator::generate_solution(const float timestep, const std::vector<float> &vars,
                                                  const std::vector<float> &coefs)
 {
     KIT_PERF_FUNCTION()
@@ -24,7 +25,7 @@ std::vector<float> integrator::generate_solution(const float dt, const std::vect
             sum += coefs[i] * state.m_kvec[i][j];
         m_valid &= !std::isnan(sum);
 
-        sol.push_back(vars[j] + sum * dt);
+        sol.push_back(vars[j] + sum * timestep);
     }
     return sol;
 }
@@ -45,17 +46,17 @@ static std::uint32_t ipow(std::uint32_t base, std::uint32_t exponent)
     return (std::uint32_t)result;
 }
 
-bool integrator::dt_too_small(const float dt) const
+bool integrator::dt_too_small(const float timestep) const
 {
-    return limited_timestep && dt < min_dt;
+    return limited_timestep && timestep < min_timestep;
 }
-bool integrator::dt_too_big(const float dt) const
+bool integrator::dt_too_big(const float timestep) const
 {
-    return limited_timestep && dt > max_dt;
+    return limited_timestep && timestep > max_timestep;
 }
-bool integrator::dt_off_bounds(const float dt) const
+bool integrator::dt_off_bounds(const float timestep) const
 {
-    return limited_timestep && (dt_too_small(dt) || dt_too_big(dt));
+    return limited_timestep && (dt_too_small(timestep) || dt_too_big(timestep));
 }
 
 float integrator::embedded_error(const std::vector<float> &sol1, const std::vector<float> &sol2)
@@ -104,8 +105,8 @@ YAML::Node integrator::serializer::encode(const integrator &integ) const
     node["Tableau"] = integ.tableau();
     node["State"] = integ.state;
     node["Tolerance"] = integ.tolerance;
-    node["Min timestep"] = integ.min_dt;
-    node["Max timestep"] = integ.max_dt;
+    node["Min timestep"] = integ.min_timestep;
+    node["Max timestep"] = integ.max_timestep;
     node["Reversed"] = integ.reversed;
     node["Limited timestep"] = integ.limited_timestep;
     return node;
@@ -118,8 +119,8 @@ bool integrator::serializer::decode(const YAML::Node &node, integrator &integ) c
     integ.tableau(node["Tableau"].as<rk::butcher_tableau>());
     integ.state = node["State"].as<rk::state>();
     integ.tolerance = node["Tolerance"].as<float>();
-    integ.min_dt = node["Min timestep"].as<float>();
-    integ.max_dt = node["Max timestep"].as<float>();
+    integ.min_timestep = node["Min timestep"].as<float>();
+    integ.max_timestep = node["Max timestep"].as<float>();
     integ.reversed = node["Reversed"].as<bool>();
     integ.limited_timestep = node["Limited timestep"].as<bool>();
     return true;
