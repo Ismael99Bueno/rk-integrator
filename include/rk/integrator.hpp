@@ -23,9 +23,12 @@ class integrator final
     };
 #endif
 
-    integrator() = default;
-    integrator(const butcher_tableau &tb, const std::vector<float> &vars = {}, float tolerance = 1e-4f,
-               float min_dt = 1e-6f, float max_dt = 1.f);
+    integrator(const butcher_tableau &tb = butcher_tableau::rk4, const std::vector<float> &vars = {},
+               float tolerance = 1e-4f, float min_dt = 1e-6f, float max_dt = 1.f);
+
+    rk::state state;
+    float tolerance, min_dt, max_dt;
+    bool reversed = false, limited_timestep = true;
 
     template <typename ODE> bool raw_forward(float &t, float dt, ODE &ode)
     {
@@ -33,11 +36,11 @@ class integrator final
         KIT_ASSERT_ERROR(!dt_off_bounds(dt),
                          "Timestep is not between established limits. Change the timestep or adjust the limits to "
                          "include the current value - current: {0}, min: {1}, max: {2}",
-                         dt, m_min_dt, m_max_dt)
+                         dt, min_dt, max_dt)
         m_valid = true;
-        const float sdt = m_reversed ? -dt : dt;
+        const float sdt = reversed ? -dt : dt;
 
-        std::vector<float> &vars = m_state.m_vars;
+        std::vector<float> &vars = state.m_vars;
         update_kvec(t, sdt, vars, ode);
         if (m_tableau.embedded())
         {
@@ -60,18 +63,18 @@ class integrator final
         KIT_ASSERT_ERROR(!dt_off_bounds(dt),
                          "Timestep is not between established limits. Change the timestep or adjust the limits to "
                          "include the current value - current: {0}, min: {1}, max: {2}",
-                         dt, m_min_dt, m_max_dt)
+                         dt, min_dt, max_dt)
         KIT_ASSERT_WARN(
             !m_tableau.embedded(),
             "Butcher tableau has an embedded solution. Use an embedded adaptive method for better efficiency.")
 
         m_valid = true;
         if (m_error > 0.f)
-            dt = std::clamp(dt * timestep_factor(), m_min_dt, m_max_dt);
+            dt = std::clamp(dt * timestep_factor(), min_dt, max_dt);
         for (;;)
         {
-            const float sdt = m_reversed ? -dt : dt;
-            std::vector<float> &vars = m_state.m_vars;
+            const float sdt = reversed ? -dt : dt;
+            std::vector<float> &vars = state.m_vars;
             std::vector<float> sol1 = vars;
             update_kvec(t, sdt, vars, ode);
 
@@ -84,17 +87,17 @@ class integrator final
             m_error = reiterative_error(sol1, sol2);
 
             const bool too_small = dt_too_small(dt);
-            if (m_error <= m_tolerance || too_small)
+            if (m_error <= tolerance || too_small)
             {
                 vars = sol1;
                 if (too_small)
-                    dt = m_min_dt;
+                    dt = min_dt;
                 break;
             }
             dt *= timestep_factor();
         }
-        m_error = std::max(m_error, m_tolerance / TOL_PART);
-        t += m_reversed ? -dt : dt;
+        m_error = std::max(m_error, tolerance / TOL_PART);
+        t += reversed ? -dt : dt;
         KIT_ASSERT_WARN(m_valid, "NaN encountered when computing runge-kutta solution.")
         return m_valid;
     }
@@ -107,62 +110,46 @@ class integrator final
         KIT_ASSERT_ERROR(!dt_off_bounds(dt),
                          "Timestep is not between established limits. Change the timestep or adjust the limits to "
                          "include the vars value - vars: {0}, min: {1}, max: {2}",
-                         dt, m_min_dt, m_max_dt)
+                         dt, min_dt, max_dt)
         m_valid = true;
 
         if (m_error > 0.f)
-            dt = std::clamp(dt * timestep_factor(), m_min_dt, m_max_dt);
+            dt = std::clamp(dt * timestep_factor(), min_dt, max_dt);
         for (;;)
         {
-            const float sdt = m_reversed ? -dt : dt;
-            std::vector<float> &vars = m_state.m_vars;
+            const float sdt = reversed ? -dt : dt;
+            std::vector<float> &vars = state.m_vars;
             update_kvec(t, sdt, vars, ode);
             const std::vector<float> sol2 = generate_solution(sdt, vars, m_tableau.coefs2());
             const std::vector<float> sol1 = generate_solution(sdt, vars, m_tableau.coefs1());
             m_error = embedded_error(sol1, sol2);
 
             const bool too_small = dt_too_small(dt);
-            if (m_error <= m_tolerance || too_small)
+            if (m_error <= tolerance || too_small)
             {
                 vars = sol1;
                 if (too_small)
-                    dt = m_min_dt;
+                    dt = min_dt;
                 break;
             }
             dt *= timestep_factor();
         }
-        m_error = std::max(m_error, m_tolerance / TOL_PART);
-        t += m_reversed ? -dt : dt;
+        m_error = std::max(m_error, tolerance / TOL_PART);
+        t += reversed ? -dt : dt;
         KIT_ASSERT_WARN(m_valid, "NaN encountered when computing runge-kutta solution.")
         return m_valid;
     }
 
     const butcher_tableau &tableau() const;
-    const rk::state &state() const;
-    rk::state &state();
-
     void tableau(const butcher_tableau &tableau);
 
-    float tolerance() const;
-    float min_dt() const;
-    float max_dt() const;
     float error() const;
-
-    void tolerance(float val);
-    void min_dt(float val);
-    void max_dt(float val);
-
-    bool reversed() const;
-    void reversed(bool reversed);
-
-    bool limited_timestep() const;
-    void limited_timestep(bool limited_timestep);
+    bool valid() const;
 
   private:
     butcher_tableau m_tableau;
-    rk::state m_state;
-    float m_tolerance, m_min_dt, m_max_dt, m_error;
-    bool m_valid, m_reversed = false, m_limited_timestep = true;
+    float m_error = 0.f;
+    bool m_valid = true;
 
     std::vector<float> generate_solution(float dt, const std::vector<float> &vars, const std::vector<float> &coefs);
 
@@ -176,7 +163,7 @@ class integrator final
     template <typename ODE> void update_kvec(float t, float dt, const std::vector<float> &vars, ODE &ode)
     {
         KIT_PERF_FUNCTION()
-        auto &kvec = m_state.m_kvec;
+        auto &kvec = state.m_kvec;
         KIT_ASSERT_CRITICAL(vars.size() == kvec[0].size(),
                             "State and k-vectors size mismatch! - vars size: {0}, k-vectors size: {1}", vars.size(),
                             kvec[0].size())
