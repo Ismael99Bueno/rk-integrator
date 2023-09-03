@@ -36,11 +36,24 @@ class butcher_tableau
     std::uint16_t stage() const;
     std::uint16_t order() const;
 
+    static const butcher_tableau rk1;
+    static const butcher_tableau rk2;
+    static const butcher_tableau rk4;
+    static const butcher_tableau rk38;
+    static const butcher_tableau rkf12;
+    static const butcher_tableau rkf45;
+    static const butcher_tableau rkfck45;
+    static const butcher_tableau rkf78;
+
   private:
-    std::vector<float> m_alpha, m_coefs1, m_coefs2;
+    std::vector<float> m_alpha;
+    std::vector<float> m_coefs1;
+    std::vector<float> m_coefs2;
     std::vector<std::vector<float>> m_beta;
+
     bool m_embedded;
-    std::uint16_t m_stage, m_order;
+    std::uint16_t m_stage;
+    std::uint16_t m_order;
 };
 } // namespace rk
 
