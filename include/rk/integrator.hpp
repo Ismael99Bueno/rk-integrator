@@ -28,7 +28,7 @@ class integrator final
 
     rk::state state;
     float tolerance, min_timestep, max_timestep;
-    bool reversed = false, limited_timestep = true;
+    bool reversed = false;
 
     template <typename ODE> bool raw_forward(float &time, float timestep, ODE &ode)
     {
@@ -38,6 +38,8 @@ class integrator final
                          "include the current value - current: {0}, min: {1}, max: {2}",
                          timestep, min_timestep, max_timestep)
         m_valid = true;
+
+        timestep = std::clamp(timestep, min_timestep, max_timestep);
         const float signed_timestep = reversed ? -timestep : timestep;
 
         std::vector<float> &vars = state.m_vars;
@@ -61,17 +63,12 @@ class integrator final
         KIT_PERF_FUNCTION()
         KIT_ASSERT_CRITICAL(reiterations >= 2,
                             "The amount of reiterations has to be greater than 1, otherwise the algorithm will break.")
-        KIT_ASSERT_ERROR(!timestep_off_bounds(timestep),
-                         "Timestep is not between established limits. Change the timestep or adjust the limits to "
-                         "include the current value - current: {0}, min: {1}, max: {2}",
-                         timestep, min_timestep, max_timestep)
         KIT_ASSERT_WARN(
             !m_tableau.embedded(),
             "Butcher tableau has an embedded solution. Use an embedded adaptive method for better efficiency.")
 
         m_valid = true;
-        if (m_error > 0.f)
-            timestep = std::clamp(timestep * timestep_factor(), min_timestep, max_timestep);
+        timestep = std::clamp(m_error > 0.f ? (timestep * timestep_factor()) : timestep, min_timestep, max_timestep);
         for (;;)
         {
             const float signed_timestep = reversed ? -timestep : timestep;
@@ -108,14 +105,9 @@ class integrator final
         KIT_PERF_FUNCTION()
         KIT_ASSERT_CRITICAL(m_tableau.embedded(),
                             "Cannot perform embedded adaptive stepsize without an embedded solution.")
-        KIT_ASSERT_ERROR(!timestep_off_bounds(timestep),
-                         "Timestep is not between established limits. Change the timestep or adjust the limits to "
-                         "include the vars value - vars: {0}, min: {1}, max: {2}",
-                         timestep, min_timestep, max_timestep)
         m_valid = true;
 
-        if (m_error > 0.f)
-            timestep = std::clamp(timestep * timestep_factor(), min_timestep, max_timestep);
+        timestep = std::clamp(m_error > 0.f ? (timestep * timestep_factor()) : timestep, min_timestep, max_timestep);
         for (;;)
         {
             const float signed_timestep = reversed ? -timestep : timestep;

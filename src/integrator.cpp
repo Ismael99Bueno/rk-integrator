@@ -48,15 +48,15 @@ static std::uint32_t ipow(std::uint32_t base, std::uint32_t exponent)
 
 bool integrator::timestep_too_small(const float timestep) const
 {
-    return limited_timestep && timestep < min_timestep;
+    return timestep < min_timestep;
 }
 bool integrator::timestep_too_big(const float timestep) const
 {
-    return limited_timestep && timestep > max_timestep;
+    return timestep > max_timestep;
 }
 bool integrator::timestep_off_bounds(const float timestep) const
 {
-    return limited_timestep && (timestep_too_small(timestep) || timestep_too_big(timestep));
+    return (timestep_too_small(timestep) || timestep_too_big(timestep));
 }
 
 float integrator::embedded_error(const std::vector<float> &sol1, const std::vector<float> &sol2)
@@ -108,12 +108,11 @@ YAML::Node integrator::serializer::encode(const integrator &integ) const
     node["Min timestep"] = integ.min_timestep;
     node["Max timestep"] = integ.max_timestep;
     node["Reversed"] = integ.reversed;
-    node["Limited timestep"] = integ.limited_timestep;
     return node;
 }
 bool integrator::serializer::decode(const YAML::Node &node, integrator &integ) const
 {
-    if (!node.IsMap() || node.size() != 7)
+    if (!node.IsMap() || node.size() != 6)
         return false;
 
     integ.tableau(node["Tableau"].as<rk::butcher_tableau>());
@@ -122,7 +121,6 @@ bool integrator::serializer::decode(const YAML::Node &node, integrator &integ) c
     integ.min_timestep = node["Min timestep"].as<float>();
     integ.max_timestep = node["Max timestep"].as<float>();
     integ.reversed = node["Reversed"].as<bool>();
-    integ.limited_timestep = node["Limited timestep"].as<bool>();
     return true;
 }
 #endif
