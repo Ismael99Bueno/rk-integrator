@@ -32,8 +32,8 @@ class integrator final
 
     template <typename ODE> bool raw_forward(float &time, float timestep, ODE &ode)
     {
-        KIT_PERF_SCOPE("-Physics-")
-        KIT_ASSERT_ERROR(!dt_off_bounds(timestep),
+        KIT_PERF_FUNCTION()
+        KIT_ASSERT_ERROR(!timestep_off_bounds(timestep),
                          "Timestep is not between established limits. Change the timestep or adjust the limits to "
                          "include the current value - current: {0}, min: {1}, max: {2}",
                          timestep, min_timestep, max_timestep)
@@ -58,10 +58,10 @@ class integrator final
     template <typename ODE>
     bool reiterative_forward(float &time, float &timestep, ODE &ode, std::uint8_t reiterations = 2)
     {
-        KIT_PERF_SCOPE("-Physics-")
+        KIT_PERF_FUNCTION()
         KIT_ASSERT_CRITICAL(reiterations >= 2,
                             "The amount of reiterations has to be greater than 1, otherwise the algorithm will break.")
-        KIT_ASSERT_ERROR(!dt_off_bounds(timestep),
+        KIT_ASSERT_ERROR(!timestep_off_bounds(timestep),
                          "Timestep is not between established limits. Change the timestep or adjust the limits to "
                          "include the current value - current: {0}, min: {1}, max: {2}",
                          timestep, min_timestep, max_timestep)
@@ -87,7 +87,7 @@ class integrator final
             }
             m_error = reiterative_error(sol1, sol2);
 
-            const bool too_small = dt_too_small(timestep);
+            const bool too_small = timestep_too_small(timestep);
             if (m_error <= tolerance || too_small)
             {
                 vars = sol1;
@@ -105,10 +105,10 @@ class integrator final
 
     template <typename ODE> bool embedded_forward(float &time, float &timestep, ODE &ode)
     {
-        KIT_PERF_SCOPE("-Physics-")
+        KIT_PERF_FUNCTION()
         KIT_ASSERT_CRITICAL(m_tableau.embedded(),
                             "Cannot perform embedded adaptive stepsize without an embedded solution.")
-        KIT_ASSERT_ERROR(!dt_off_bounds(timestep),
+        KIT_ASSERT_ERROR(!timestep_off_bounds(timestep),
                          "Timestep is not between established limits. Change the timestep or adjust the limits to "
                          "include the vars value - vars: {0}, min: {1}, max: {2}",
                          timestep, min_timestep, max_timestep)
@@ -125,7 +125,7 @@ class integrator final
             const std::vector<float> sol1 = generate_solution(signed_timestep, vars, m_tableau.coefs1());
             m_error = embedded_error(sol1, sol2);
 
-            const bool too_small = dt_too_small(timestep);
+            const bool too_small = timestep_too_small(timestep);
             if (m_error <= tolerance || too_small)
             {
                 vars = sol1;
@@ -155,9 +155,9 @@ class integrator final
     std::vector<float> generate_solution(float timestep, const std::vector<float> &vars,
                                          const std::vector<float> &coefs);
 
-    bool dt_too_small(float timestep) const;
-    bool dt_too_big(float timestep) const;
-    bool dt_off_bounds(float timestep) const;
+    bool timestep_too_small(float timestep) const;
+    bool timestep_too_big(float timestep) const;
+    bool timestep_off_bounds(float timestep) const;
     static float embedded_error(const std::vector<float> &sol1, const std::vector<float> &sol2);
     float reiterative_error(const std::vector<float> &sol1, const std::vector<float> &sol2) const;
     float timestep_factor() const;

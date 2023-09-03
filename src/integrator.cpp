@@ -46,17 +46,17 @@ static std::uint32_t ipow(std::uint32_t base, std::uint32_t exponent)
     return (std::uint32_t)result;
 }
 
-bool integrator::dt_too_small(const float timestep) const
+bool integrator::timestep_too_small(const float timestep) const
 {
     return limited_timestep && timestep < min_timestep;
 }
-bool integrator::dt_too_big(const float timestep) const
+bool integrator::timestep_too_big(const float timestep) const
 {
     return limited_timestep && timestep > max_timestep;
 }
-bool integrator::dt_off_bounds(const float timestep) const
+bool integrator::timestep_off_bounds(const float timestep) const
 {
-    return limited_timestep && (dt_too_small(timestep) || dt_too_big(timestep));
+    return limited_timestep && (timestep_too_small(timestep) || timestep_too_big(timestep));
 }
 
 float integrator::embedded_error(const std::vector<float> &sol1, const std::vector<float> &sol2)
