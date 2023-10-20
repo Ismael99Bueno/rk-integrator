@@ -28,7 +28,7 @@ class state
     void reserve(std::size_t capacity);
     void clear();
 
-    const float &operator[](std::size_t index) const;
+    float operator[](std::size_t index) const;
     float &operator[](std::size_t index);
 
     const std::vector<float> &vars() const;

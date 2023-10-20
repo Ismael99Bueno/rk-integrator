@@ -26,7 +26,7 @@ void state::resize(const std::size_t size)
     resize();
 }
 
-const float &state::operator[](std::size_t index) const
+float state::operator[](std::size_t index) const
 {
     return m_vars[index];
 }
