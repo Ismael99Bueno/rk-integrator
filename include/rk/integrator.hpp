@@ -1,5 +1,4 @@
-#ifndef RK_INTEGRATOR_HPP
-#define RK_INTEGRATOR_HPP
+#pragma once
 
 #include "rk/butcher_tableau.hpp"
 #include "rk/state.hpp"
@@ -180,5 +179,3 @@ class integrator final
 };
 
 } // namespace rk
-
-#endif

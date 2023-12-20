@@ -1,5 +1,4 @@
-#ifndef RK_BUTCHER_TABLEAU_HPP
-#define RK_BUTCHER_TABLEAU_HPP
+#pragma once
 
 #include <vector>
 #include <cstdint>
@@ -56,5 +55,3 @@ class butcher_tableau
     std::uint16_t m_order;
 };
 } // namespace rk
-
-#endif

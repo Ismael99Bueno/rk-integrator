@@ -1,5 +1,4 @@
-#ifndef RK_PCH_HPP
-#define RK_PCH_HPP
+#pragma once
 
 #include <vector>
 #include <cstdint>
@@ -8,5 +7,3 @@
 #include <yaml-cpp/yaml.h>
 #endif
 #include "kit/debug/log.hpp"
-
-#endif

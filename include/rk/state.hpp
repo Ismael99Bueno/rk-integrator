@@ -1,5 +1,4 @@
-#ifndef RK_STATE_HPP
-#define RK_STATE_HPP
+#pragma once
 
 #include <vector>
 #include "kit/interface/serialization.hpp"
@@ -46,5 +45,3 @@ class state
     friend class integrator;
 };
 } // namespace rk
-
-#endif
