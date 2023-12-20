@@ -4,6 +4,7 @@
 #include "rk/butcher_tableau.hpp"
 #include "rk/state.hpp"
 #include "kit/profile/perf.hpp"
+#include "kit/debug/log.hpp"
 #include <cstdint>
 #include <cmath>
 
