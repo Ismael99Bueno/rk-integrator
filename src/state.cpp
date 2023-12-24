@@ -4,7 +4,7 @@
 namespace rk
 {
 template <typename T>
-state<T>::state(const std::vector<T> &vars, const std::uint32_t stage) : m_vars(vars), m_kvec(stage)
+state<T>::state(const std::vector<T> &vars, const std::uint32_t stages) : m_vars(vars), m_kvec(stages)
 {
     resize_kvec_length();
 }
@@ -57,9 +57,9 @@ template <typename T> void state<T>::resize_kvec_length()
         v.resize(m_vars.size());
 }
 
-template <typename T> void state<T>::reset_stage(const std::uint32_t stage)
+template <typename T> void state<T>::set_stages(const std::uint32_t stages)
 {
-    m_kvec.resize(stage);
+    m_kvec.resize(stages);
     resize_kvec_length();
 }
 

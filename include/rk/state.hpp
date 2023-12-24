@@ -38,7 +38,7 @@ template <typename T> class state
 
   private:
     void resize_kvec_length();
-    void reset_stage(std::uint32_t stages);
+    void set_stages(std::uint32_t stages);
 
     std::vector<T> m_vars;
     std::vector<std::vector<T>> m_kvec;
