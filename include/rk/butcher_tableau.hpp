@@ -19,10 +19,10 @@ template <typename T> struct butcher_tableau
 
     butcher_tableau() = default;
     butcher_tableau(const std::vector<T> &alpha, const std::vector<std::vector<T>> &beta, const std::vector<T> &coefs,
-                    std::uint16_t stages, std::uint16_t order);
+                    std::uint32_t stages, std::uint32_t order);
 
     butcher_tableau(const std::vector<T> &alpha, const std::vector<std::vector<T>> &beta, const std::vector<T> &coefs1,
-                    const std::vector<T> &coefs2, std::uint16_t stages, std::uint16_t order);
+                    const std::vector<T> &coefs2, std::uint32_t stages, std::uint32_t order);
 
     std::vector<T> alpha;
     std::vector<T> coefs1;
@@ -30,8 +30,8 @@ template <typename T> struct butcher_tableau
     std::vector<std::vector<T>> beta;
 
     bool embedded;
-    std::uint16_t stages;
-    std::uint16_t order;
+    std::uint32_t stages;
+    std::uint32_t order;
 
     static const butcher_tableau rk1;
     static const butcher_tableau rk2;
@@ -41,7 +41,5 @@ template <typename T> struct butcher_tableau
     static const butcher_tableau rkf45;
     static const butcher_tableau rkfck45;
     static const butcher_tableau rkf78;
-
-  private:
 };
 } // namespace rk

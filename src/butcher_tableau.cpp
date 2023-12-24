@@ -5,7 +5,7 @@ namespace rk
 {
 template <typename T>
 butcher_tableau<T>::butcher_tableau(const std::vector<T> &alpha, const std::vector<std::vector<T>> &beta,
-                                    const std::vector<T> &coefs, const std::uint16_t stages, const std::uint16_t order)
+                                    const std::vector<T> &coefs, const std::uint32_t stages, const std::uint32_t order)
     : alpha(alpha), coefs1(coefs), beta(beta), embedded(false), stages(stages), order(order)
 {
 }
@@ -13,7 +13,7 @@ butcher_tableau<T>::butcher_tableau(const std::vector<T> &alpha, const std::vect
 template <typename T>
 butcher_tableau<T>::butcher_tableau(const std::vector<T> &alpha, const std::vector<std::vector<T>> &beta,
                                     const std::vector<T> &coefs1, const std::vector<T> &coefs2,
-                                    const std::uint16_t stages, const std::uint16_t order)
+                                    const std::uint32_t stages, const std::uint32_t order)
     : alpha(alpha), coefs1(coefs1), coefs2(coefs2), beta(beta), embedded(true), stages(stages), order(order)
 {
 }
@@ -134,13 +134,13 @@ template <typename T> bool butcher_tableau<T>::serializer::decode(const YAML::No
             coefs1.push_back(n.as<float>());
         for (const auto &n : node["Coefs2"])
             coefs2.push_back(n.as<float>());
-        tb = {alpha, beta, coefs1, coefs2, node["Stage"].as<std::uint16_t>(), node["Order"].as<std::uint16_t>()};
+        tb = {alpha, beta, coefs1, coefs2, node["Stage"].as<std::uint32_t>(), node["Order"].as<std::uint32_t>()};
         return true;
     }
     else
         for (const auto &n : node["Coefs"])
             coefs1.push_back(n.as<float>());
-    tb = {alpha, beta, coefs1, node["Stage"].as<std::uint16_t>(), node["Order"].as<std::uint16_t>()};
+    tb = {alpha, beta, coefs1, node["Stage"].as<std::uint32_t>(), node["Order"].as<std::uint32_t>()};
     return true;
 }
 #endif

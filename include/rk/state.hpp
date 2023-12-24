@@ -5,7 +5,7 @@
 
 namespace rk
 {
-class state
+template <typename T> class state
 {
   public:
 #ifdef KIT_USE_YAML_CPP
@@ -18,29 +18,30 @@ class state
 #endif
 
     state() = default;
-    state(const std::vector<float> &vars, std::uint16_t stage);
+    state(const std::vector<T> &vars, std::uint32_t stages);
 
-    void push_back(float elm);
-    void append(std::initializer_list<float> lst);
+    void push_back(T elm);
+    void append(std::initializer_list<T> lst);
+
     void resize(std::size_t size);
-
     void reserve(std::size_t capacity);
+
     void clear();
 
-    float operator[](std::size_t index) const;
-    float &operator[](std::size_t index);
+    T operator[](std::size_t index) const;
+    T &operator[](std::size_t index);
 
-    const std::vector<float> &vars() const;
-    void vars(const std::vector<float> &vars);
+    const std::vector<T> &vars() const;
+    void vars(const std::vector<T> &vars);
 
     std::size_t size() const;
 
   private:
-    void resize();
-    void resize_kvec(std::uint16_t stage);
+    void resize_kvec_length();
+    void reset_stage(std::uint32_t stages);
 
-    std::vector<float> m_vars;
-    std::vector<std::vector<float>> m_kvec;
+    std::vector<T> m_vars;
+    std::vector<std::vector<T>> m_kvec;
 
     friend class integrator;
 };

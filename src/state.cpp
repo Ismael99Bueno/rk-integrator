@@ -3,83 +3,84 @@
 
 namespace rk
 {
-state::state(const std::vector<float> &vars, const std::uint16_t stage) : m_vars(vars), m_kvec(stage)
+template <typename T>
+state<T>::state(const std::vector<T> &vars, const std::uint32_t stage) : m_vars(vars), m_kvec(stage)
 {
-    resize();
+    resize_kvec_length();
 }
 
-void state::push_back(const float elm)
+template <typename T> void state<T>::push_back(const T elm)
 {
     m_vars.push_back(elm);
-    resize();
+    resize_kvec_length();
 }
 
-void state::append(std::initializer_list<float> lst)
+template <typename T> void state<T>::append(std::initializer_list<T> lst)
 {
     m_vars.insert(m_vars.end(), lst);
-    resize();
+    resize_kvec_length();
 }
 
-void state::resize(const std::size_t size)
+template <typename T> void state<T>::resize(const std::size_t size)
 {
     m_vars.resize(size);
-    resize();
+    resize_kvec_length();
 }
 
-float state::operator[](std::size_t index) const
+template <typename T> T state<T>::operator[](std::size_t index) const
 {
     return m_vars[index];
 }
-float &state::operator[](std::size_t index)
+template <typename T> T &state<T>::operator[](std::size_t index)
 {
     return m_vars[index];
 }
 
-void state::reserve(const std::size_t capacity)
+template <typename T> void state<T>::reserve(const std::size_t capacity)
 {
     m_vars.reserve(capacity);
     m_vars.reserve(capacity);
-    for (std::vector<float> &v : m_kvec)
+    for (std::vector<T> &v : m_kvec)
         v.reserve(capacity);
 }
 
-void state::clear()
+template <typename T> void state<T>::clear()
 {
     m_vars.clear();
-    for (std::vector<float> &v : m_kvec)
+    for (std::vector<T> &v : m_kvec)
         v.clear();
 }
 
-void state::resize()
+template <typename T> void state<T>::resize_kvec_length()
 {
-    for (std::vector<float> &v : m_kvec)
+    for (std::vector<T> &v : m_kvec)
         v.resize(m_vars.size());
 }
 
-void state::resize_kvec(const std::uint16_t stage)
+template <typename T> void state<T>::reset_stage(const std::uint32_t stage)
 {
     m_kvec.resize(stage);
-    resize();
+    resize_kvec_length();
 }
 
-const std::vector<float> &state::vars() const
+template <typename T> const std::vector<T> &state<T>::vars() const
 {
     return m_vars;
 }
 
-void state::vars(const std::vector<float> &vars)
+template <typename T> void state<T>::vars(const std::vector<T> &vars)
 {
     m_vars = vars;
-    resize();
+    resize_kvec_length();
 }
 
-std::size_t state::size() const
+template <typename T> std::size_t state<T>::size() const
 {
     return m_vars.size();
 }
 
 #ifdef KIT_USE_YAML_CPP
-YAML::Node state::serializer::encode(const state &st) const
+template <typename T> YAML::Node state<T>::serializer::encode(const state &st) const
 {
     YAML::Node node;
     node["State variables"] = st.vars();
@@ -93,25 +94,29 @@ YAML::Node state::serializer::encode(const state &st) const
     }
     return node;
 }
-bool state::serializer::decode(const YAML::Node &node, state &st) const
+template <typename T> bool state<T>::serializer::decode(const YAML::Node &node, state &st) const
 {
     if (!node.IsMap() || node.size() != 2)
         return false;
 
-    std::vector<float> vars;
-    std::vector<std::vector<float>> k_vec;
+    std::vector<T> vars;
+    std::vector<std::vector<T>> k_vec;
     for (const auto &n1 : node["K-Vectors"])
     {
         auto &v1 = k_vec.emplace_back();
         for (const auto &n2 : n1)
-            v1.push_back(n2.as<float>());
+            v1.push_back(n2.as<T>());
     }
     for (const auto &n : node["State variables"])
-        vars.push_back(n.as<float>());
+        vars.push_back(n.as<T>());
     st.m_vars = vars;
     st.m_kvec = k_vec;
 
     return true;
 }
 #endif
+
+template class state<float>;
+template class state<double>;
+template class state<long double>;
 } // namespace rk
