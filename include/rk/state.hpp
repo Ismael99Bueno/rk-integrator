@@ -43,6 +43,6 @@ template <typename T> class state
     std::vector<T> m_vars;
     std::vector<std::vector<T>> m_kvec;
 
-    friend class integrator;
+    template <typename U> friend class integrator;
 };
 } // namespace rk

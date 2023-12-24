@@ -2,63 +2,61 @@
 
 #include "rk/butcher_tableau.hpp"
 #include "rk/state.hpp"
+#include "rk/timestep.hpp"
 #include "kit/profile/perf.hpp"
 #include "kit/debug/log.hpp"
 #include <cstdint>
-#include <cmath>
-
-#define TOL_PART 256.f
 
 namespace rk
 {
-class integrator final
+template <typename T> class integrator final
 {
   public:
 #ifdef KIT_USE_YAML_CPP
     class serializer : public kit::serializer<integrator>
     {
       public:
-        YAML::Node encode(const integrator &tb) const override;
-        bool decode(const YAML::Node &node, integrator &tb) const override;
+        YAML::Node encode(const integrator &integ) const override;
+        bool decode(const YAML::Node &node, integrator &integ) const override;
     };
 #endif
 
-    integrator(const butcher_tableau &tb = butcher_tableau::rk4, const std::vector<float> &vars = {},
-               float tolerance = 1e-4f, float min_timestep = 1e-6f, float max_timestep = 1.f);
+    static inline constexpr T TOL_PART = 256.0;
 
-    rk::state state;
-    float tolerance, min_timestep, max_timestep;
-    bool reversed = false;
+    integrator(const timestep<T> &ts, const butcher_tableau<T> &bt = butcher_tableau<T>::rk4,
+               const std::vector<T> &vars = {}, T tolerance = 1e-4);
 
-    template <typename ODE> bool raw_forward(float &time, float timestep, ODE &ode)
+    rk::state<T> state;
+    timestep<T> ts;
+
+    T tolerance;
+    T elapsed = 0.0;
+
+    template <typename ODE> bool raw_forward(ODE &ode)
     {
         KIT_PERF_FUNCTION()
-        KIT_ASSERT_ERROR(!timestep_off_bounds(timestep),
-                         "Timestep is not between established limits. Change the timestep or adjust the limits to "
-                         "include the current value - current: {0}, min: {1}, max: {2}",
-                         timestep, min_timestep, max_timestep)
         m_valid = true;
 
-        timestep = std::clamp(timestep, min_timestep, max_timestep);
-        const float signed_timestep = reversed ? -timestep : timestep;
+        if (ts.limited)
+            ts.clamp();
 
-        std::vector<float> &vars = state.m_vars;
-        update_kvec(time, signed_timestep, vars, ode);
+        std::vector<T> &vars = state.m_vars;
+        update_kvec(elapsed, ts.value, vars, ode);
+
         if (m_tableau.embedded())
         {
-            const std::vector<float> aux_state = generate_solution(signed_timestep, vars, m_tableau.coefs2());
-            vars = generate_solution(signed_timestep, vars, m_tableau.coefs1());
+            const std::vector<T> aux_state = generate_solution(ts.value, vars, m_tableau.coefs2());
+            vars = generate_solution(ts.value, vars, m_tableau.coefs1());
             m_error = embedded_error(vars, aux_state);
         }
         else
-            vars = generate_solution(signed_timestep, vars, m_tableau.coefs());
-        time += signed_timestep;
+            vars = generate_solution(ts.value, vars, m_tableau.coefs());
+        elapsed += ts.value;
         KIT_ASSERT_WARN(m_valid, "NaN encountered when computing runge-kutta solution.")
         return m_valid;
     }
 
-    template <typename ODE>
-    bool reiterative_forward(float &time, float &timestep, ODE &ode, std::uint8_t reiterations = 2)
+    template <typename ODE> bool reiterative_forward(ODE &ode, std::uint32_t reiterations = 2)
     {
         KIT_PERF_FUNCTION()
         KIT_ASSERT_CRITICAL(reiterations >= 2,
@@ -68,114 +66,117 @@ class integrator final
             "Butcher tableau has an embedded solution. Use an embedded adaptive method for better efficiency.")
 
         m_valid = true;
-        timestep = std::clamp(m_error > 0.f ? (timestep * timestep_factor()) : timestep, min_timestep, max_timestep);
+
+        if (m_error > 0.0)
+            ts.value *= timestep_factor();
+        ts.clamp();
+
         for (;;)
         {
-            const float signed_timestep = reversed ? -timestep : timestep;
-            std::vector<float> &vars = state.m_vars;
-            std::vector<float> sol1 = vars;
-            update_kvec(time, signed_timestep, vars, ode);
+            std::vector<T> &vars = state.m_vars;
+            std::vector<T> sol1 = vars;
+            update_kvec(elapsed, ts.value, vars, ode);
 
-            const std::vector<float> sol2 = generate_solution(signed_timestep, vars, m_tableau.coefs());
-            for (std::uint8_t i = 0; i < reiterations; i++)
+            const std::vector<T> sol2 = generate_solution(ts.value, vars, m_tableau.coefs());
+            for (std::uint32_t i = 0; i < reiterations; i++)
             {
-                update_kvec(time, signed_timestep / reiterations, sol1, ode);
-                sol1 = generate_solution(signed_timestep / reiterations, sol1, m_tableau.coefs());
+                update_kvec(elapsed, ts.value / reiterations, sol1, ode);
+                sol1 = generate_solution(ts.value / reiterations, sol1, m_tableau.coefs());
             }
             m_error = reiterative_error(sol1, sol2);
 
-            const bool too_small = timestep_too_small(timestep);
+            const bool too_small = ts.too_small();
             if (m_error <= tolerance || too_small)
             {
                 vars = sol1;
                 if (too_small)
-                    timestep = min_timestep;
+                    ts.value = ts.min;
                 break;
             }
-            timestep *= timestep_factor();
+            ts.value *= timestep_factor();
         }
         m_error = std::max(m_error, tolerance / TOL_PART);
-        time += reversed ? -timestep : timestep;
+        elapsed += ts.value;
+
         KIT_ASSERT_WARN(m_valid, "NaN encountered when computing runge-kutta solution.")
         return m_valid;
     }
 
-    template <typename ODE> bool embedded_forward(float &time, float &timestep, ODE &ode)
+    template <typename ODE> bool embedded_forward(ODE &ode)
     {
         KIT_PERF_FUNCTION()
         KIT_ASSERT_CRITICAL(m_tableau.embedded(),
                             "Cannot perform embedded adaptive stepsize without an embedded solution.")
         m_valid = true;
 
-        timestep = std::clamp(m_error > 0.f ? (timestep * timestep_factor()) : timestep, min_timestep, max_timestep);
+        if (m_error > 0.0)
+            ts.value *= timestep_factor();
+        ts.clamp();
+
         for (;;)
         {
-            const float signed_timestep = reversed ? -timestep : timestep;
-            std::vector<float> &vars = state.m_vars;
-            update_kvec(time, signed_timestep, vars, ode);
-            const std::vector<float> sol2 = generate_solution(signed_timestep, vars, m_tableau.coefs2());
-            const std::vector<float> sol1 = generate_solution(signed_timestep, vars, m_tableau.coefs1());
+            std::vector<T> &vars = state.m_vars;
+            update_kvec(time, ts.value, vars, ode);
+            const std::vector<T> sol2 = generate_solution(ts.value, vars, m_tableau.coefs2());
+            const std::vector<T> sol1 = generate_solution(ts.value, vars, m_tableau.coefs1());
             m_error = embedded_error(sol1, sol2);
 
-            const bool too_small = timestep_too_small(timestep);
+            const bool too_small = ts.too_small();
             if (m_error <= tolerance || too_small)
             {
                 vars = sol1;
                 if (too_small)
-                    timestep = min_timestep;
+                    ts.value = ts.min;
                 break;
             }
-            timestep *= timestep_factor();
+            ts.value *= timestep_factor();
         }
         m_error = std::max(m_error, tolerance / TOL_PART);
-        time += reversed ? -timestep : timestep;
+        elapsed += ts.value;
+
         KIT_ASSERT_WARN(m_valid, "NaN encountered when computing runge-kutta solution.")
         return m_valid;
     }
 
-    const butcher_tableau &tableau() const;
-    void tableau(const butcher_tableau &tableau);
+    const butcher_tableau<T> &tableau() const;
+    void tableau(const butcher_tableau<T> &tableau);
 
-    float error() const;
+    T error() const;
     bool valid() const;
 
   private:
-    butcher_tableau m_tableau;
-    float m_error = 0.f;
+    butcher_tableau<T> m_tableau;
+    T m_error = 0.0;
     bool m_valid = true;
 
-    std::vector<float> generate_solution(float timestep, const std::vector<float> &vars,
-                                         const std::vector<float> &coefs);
-
-    bool timestep_too_small(float timestep) const;
-    bool timestep_too_big(float timestep) const;
-    bool timestep_off_bounds(float timestep) const;
-    static float embedded_error(const std::vector<float> &sol1, const std::vector<float> &sol2);
-    float reiterative_error(const std::vector<float> &sol1, const std::vector<float> &sol2) const;
-    float timestep_factor() const;
-
-    template <typename ODE> void update_kvec(float time, float timestep, const std::vector<float> &vars, ODE &ode)
+    template <typename ODE> void update_kvec(T time, T timestep, const std::vector<T> &vars, ODE &ode)
     {
         KIT_PERF_FUNCTION()
         auto &kvec = state.m_kvec;
         KIT_ASSERT_CRITICAL(vars.size() == kvec[0].size(),
                             "State and k-vectors size mismatch! - vars size: {0}, k-vectors size: {1}", vars.size(),
                             kvec[0].size())
-        std::vector<float> aux_vars(vars.size());
+        std::vector<T> aux_vars(vars.size());
 
         kvec[0] = ode(time, timestep, vars);
-        for (std::uint8_t i = 1; i < m_tableau.stage(); i++)
+        for (std::uint32_t i = 1; i < m_tableau.stages; i++)
         {
             for (std::size_t j = 0; j < vars.size(); j++)
             {
-                float k_sum = 0.f;
-                for (std::uint8_t k = 0; k < i; k++)
+                T k_sum = 0.0;
+                for (std::uint32_t k = 0; k < i; k++)
                     k_sum += m_tableau.beta()[i - 1][k] * kvec[k][j];
                 aux_vars[j] = vars[j] + k_sum * timestep;
             }
             kvec[i] = ode(time + m_tableau.alpha()[i - 1] * timestep, timestep, aux_vars);
         }
     }
+
+    std::vector<T> generate_solution(T timestep, const std::vector<T> &vars, const std::vector<T> &coefs);
+
+    static T embedded_error(const std::vector<T> &sol1, const std::vector<T> &sol2);
+    T reiterative_error(const std::vector<T> &sol1, const std::vector<T> &sol2) const;
+    T timestep_factor() const;
 };
 
 } // namespace rk
