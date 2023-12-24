@@ -101,7 +101,7 @@ template <typename T> YAML::Node integrator<T>::serializer::encode(const integra
 }
 template <typename T> bool integrator<T>::serializer::decode(const YAML::Node &node, integrator &integ) const
 {
-    if (!node.IsMap() || node.size() != 8)
+    if (!node.IsMap() || node.size() != 7)
         return false;
 
     integ.tableau(node["Tableau"].as<rk::butcher_tableau<T>>());

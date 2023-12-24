@@ -28,7 +28,7 @@ template <typename T> void timestep<T>::clamp()
     value = std::clamp(value, min, max);
 }
 
-template class timestep<float>;
-template class timestep<double>;
-template class timestep<long double>;
+template struct timestep<float>;
+template struct timestep<double>;
+template struct timestep<long double>;
 } // namespace rk

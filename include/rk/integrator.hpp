@@ -21,16 +21,16 @@ template <typename T> class integrator final
     };
 #endif
 
-    static inline constexpr T TOL_PART = 256.0;
+    static inline constexpr T TOL_PART = 256.f;
 
-    integrator(const timestep<T> &ts, const butcher_tableau<T> &bt = butcher_tableau<T>::rk4,
-               const std::vector<T> &vars = {}, T tolerance = 1e-4);
+    integrator(const timestep<T> &ts = {1.e-3f}, const butcher_tableau<T> &bt = butcher_tableau<T>::rk4,
+               const std::vector<T> &vars = {}, T tolerance = 1e-4f);
 
     rk::state<T> state;
     timestep<T> ts;
 
     T tolerance;
-    T elapsed = 0.0;
+    T elapsed = 0.f;
 
     template <typename ODE> bool raw_forward(ODE &ode)
     {
@@ -43,14 +43,14 @@ template <typename T> class integrator final
         std::vector<T> &vars = state.m_vars;
         update_kvec(elapsed, ts.value, vars, ode);
 
-        if (m_tableau.embedded())
+        if (m_tableau.embedded)
         {
-            const std::vector<T> aux_state = generate_solution(ts.value, vars, m_tableau.coefs2());
-            vars = generate_solution(ts.value, vars, m_tableau.coefs1());
+            const std::vector<T> aux_state = generate_solution(ts.value, vars, m_tableau.coefs2);
+            vars = generate_solution(ts.value, vars, m_tableau.coefs1);
             m_error = embedded_error(vars, aux_state);
         }
         else
-            vars = generate_solution(ts.value, vars, m_tableau.coefs());
+            vars = generate_solution(ts.value, vars, m_tableau.coefs1);
         elapsed += ts.value;
         KIT_ASSERT_WARN(m_valid, "NaN encountered when computing runge-kutta solution.")
         return m_valid;
@@ -67,7 +67,7 @@ template <typename T> class integrator final
 
         m_valid = true;
 
-        if (m_error > 0.0)
+        if (m_error > 0.f)
             ts.value *= timestep_factor();
         ts.clamp();
 
@@ -77,11 +77,11 @@ template <typename T> class integrator final
             std::vector<T> sol1 = vars;
             update_kvec(elapsed, ts.value, vars, ode);
 
-            const std::vector<T> sol2 = generate_solution(ts.value, vars, m_tableau.coefs());
+            const std::vector<T> sol2 = generate_solution(ts.value, vars, m_tableau.coefs1);
             for (std::uint32_t i = 0; i < reiterations; i++)
             {
                 update_kvec(elapsed, ts.value / reiterations, sol1, ode);
-                sol1 = generate_solution(ts.value / reiterations, sol1, m_tableau.coefs());
+                sol1 = generate_solution(ts.value / reiterations, sol1, m_tableau.coefs1);
             }
             m_error = reiterative_error(sol1, sol2);
 
@@ -109,7 +109,7 @@ template <typename T> class integrator final
                             "Cannot perform embedded adaptive stepsize without an embedded solution.")
         m_valid = true;
 
-        if (m_error > 0.0)
+        if (m_error > 0.f)
             ts.value *= timestep_factor();
         ts.clamp();
 
@@ -117,8 +117,8 @@ template <typename T> class integrator final
         {
             std::vector<T> &vars = state.m_vars;
             update_kvec(time, ts.value, vars, ode);
-            const std::vector<T> sol2 = generate_solution(ts.value, vars, m_tableau.coefs2());
-            const std::vector<T> sol1 = generate_solution(ts.value, vars, m_tableau.coefs1());
+            const std::vector<T> sol2 = generate_solution(ts.value, vars, m_tableau.coefs2);
+            const std::vector<T> sol1 = generate_solution(ts.value, vars, m_tableau.coefs1);
             m_error = embedded_error(sol1, sol2);
 
             const bool too_small = ts.too_small();
@@ -146,7 +146,7 @@ template <typename T> class integrator final
 
   private:
     butcher_tableau<T> m_tableau;
-    T m_error = 0.0;
+    T m_error = 0.f;
     bool m_valid = true;
 
     template <typename ODE> void update_kvec(T time, T timestep, const std::vector<T> &vars, ODE &ode)
@@ -163,12 +163,12 @@ template <typename T> class integrator final
         {
             for (std::size_t j = 0; j < vars.size(); j++)
             {
-                T k_sum = 0.0;
+                T k_sum = 0.f;
                 for (std::uint32_t k = 0; k < i; k++)
-                    k_sum += m_tableau.beta()[i - 1][k] * kvec[k][j];
+                    k_sum += m_tableau.beta[i - 1][k] * kvec[k][j];
                 aux_vars[j] = vars[j] + k_sum * timestep;
             }
-            kvec[i] = ode(time + m_tableau.alpha()[i - 1] * timestep, timestep, aux_vars);
+            kvec[i] = ode(time + m_tableau.alpha[i - 1] * timestep, timestep, aux_vars);
         }
     }
 
