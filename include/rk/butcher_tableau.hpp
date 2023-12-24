@@ -6,9 +6,8 @@
 
 namespace rk
 {
-class butcher_tableau
+template <typename T> struct butcher_tableau
 {
-  public:
 #ifdef KIT_USE_YAML_CPP
     class serializer : public kit::serializer<butcher_tableau>
     {
@@ -19,21 +18,20 @@ class butcher_tableau
 #endif
 
     butcher_tableau() = default;
-    butcher_tableau(const std::vector<float> &alpha, const std::vector<std::vector<float>> &beta,
-                    const std::vector<float> &coefs, std::uint16_t stage, std::uint16_t order);
+    butcher_tableau(const std::vector<T> &alpha, const std::vector<std::vector<T>> &beta, const std::vector<T> &coefs,
+                    std::uint16_t stages, std::uint16_t order);
 
-    butcher_tableau(const std::vector<float> &alpha, const std::vector<std::vector<float>> &beta,
-                    const std::vector<float> &coefs1, const std::vector<float> &coefs2, std::uint16_t stage,
-                    std::uint16_t order);
+    butcher_tableau(const std::vector<T> &alpha, const std::vector<std::vector<T>> &beta, const std::vector<T> &coefs1,
+                    const std::vector<T> &coefs2, std::uint16_t stages, std::uint16_t order);
 
-    const std::vector<float> &alpha() const;
-    const std::vector<std::vector<float>> &beta() const;
-    const std::vector<float> &coefs() const;
-    const std::vector<float> &coefs1() const;
-    const std::vector<float> &coefs2() const;
-    bool embedded() const;
-    std::uint16_t stage() const;
-    std::uint16_t order() const;
+    std::vector<T> alpha;
+    std::vector<T> coefs1;
+    std::vector<T> coefs2;
+    std::vector<std::vector<T>> beta;
+
+    bool embedded;
+    std::uint16_t stages;
+    std::uint16_t order;
 
     static const butcher_tableau rk1;
     static const butcher_tableau rk2;
@@ -45,13 +43,5 @@ class butcher_tableau
     static const butcher_tableau rkf78;
 
   private:
-    std::vector<float> m_alpha;
-    std::vector<float> m_coefs1;
-    std::vector<float> m_coefs2;
-    std::vector<std::vector<float>> m_beta;
-
-    bool m_embedded;
-    std::uint16_t m_stage;
-    std::uint16_t m_order;
 };
 } // namespace rk
