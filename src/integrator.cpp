@@ -97,11 +97,12 @@ template <typename T> YAML::Node integrator<T>::serializer::encode(const integra
     node["Timestep"] = integ.ts.value;
     node["Min timestep"] = integ.ts.min;
     node["Max timestep"] = integ.ts.max;
+    node["Limited timestep"] = integ.ts.limited;
     return node;
 }
 template <typename T> bool integrator<T>::serializer::decode(const YAML::Node &node, integrator &integ) const
 {
-    if (!node.IsMap() || node.size() != 7)
+    if (!node.IsMap() || node.size() != 8)
         return false;
 
     integ.tableau(node["Tableau"].as<rk::butcher_tableau<T>>());
@@ -111,6 +112,7 @@ template <typename T> bool integrator<T>::serializer::decode(const YAML::Node &n
     integ.ts.value = node["Timestep"].as<T>();
     integ.ts.min = node["Min timestep"].as<T>();
     integ.ts.max = node["Max timestep"].as<T>();
+    integ.ts.limited = node["Limited timestep"].as<bool>();
     return true;
 }
 #endif
