@@ -1,4 +1,5 @@
 #pragma once
+#ifdef KIT_USE_YAML_CPP
 
 #include "rk/integration/integrator.hpp"
 #include "kit/serialization/yaml/codec.hpp"
@@ -147,3 +148,4 @@ template <typename T> struct kit::yaml::codec<rk::integrator<T>>
         return true;
     }
 };
+#endif
