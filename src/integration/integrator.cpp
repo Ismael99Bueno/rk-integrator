@@ -5,23 +5,23 @@
 
 namespace rk
 {
-template <typename T>
-integrator<T>::integrator(const timestep<T> &ts, const butcher_tableau<T> &bt, const std::vector<T> &vars,
-                          const T tolerance)
+template <typename Float>
+integrator<Float>::integrator(const timestep<Float> &ts, const butcher_tableau<Float> &bt,
+                              const std::vector<Float> &vars, const Float tolerance)
     : state(vars, bt.stages), ts(ts), tolerance(tolerance), m_tableau(bt)
 {
 }
 
-template <typename T>
-std::vector<T> integrator<T>::generate_solution(const T timestep, const std::vector<T> &vars,
-                                                const std::vector<T> &coefs)
+template <typename Float>
+std::vector<Float> integrator<Float>::generate_solution(const Float timestep, const std::vector<Float> &vars,
+                                                        const std::vector<Float> &coefs)
 {
     KIT_PERF_FUNCTION()
-    std::vector<T> sol;
+    std::vector<Float> sol;
     sol.reserve(vars.size());
     for (std::size_t j = 0; j < vars.size(); j++)
     {
-        T sum = 0.0;
+        Float sum = 0.0;
         for (std::uint8_t i = 0; i < m_tableau.stages; i++)
             sum += coefs[i] * state.m_kvec[i][j];
         m_valid &= !std::isnan(sum);
@@ -47,40 +47,42 @@ static std::uint32_t ipow(std::uint32_t base, std::uint32_t exponent)
     return (std::uint32_t)result;
 }
 
-template <typename T> T integrator<T>::embedded_error(const std::vector<T> &sol1, const std::vector<T> &sol2)
+template <typename Float>
+Float integrator<Float>::embedded_error(const std::vector<Float> &sol1, const std::vector<Float> &sol2)
 {
-    T result = 0.0;
+    Float result = 0.0;
     for (std::size_t i = 0; i < sol1.size(); i++)
         result += (sol1[i] - sol2[i]) * (sol1[i] - sol2[i]);
     return result;
 }
 
-template <typename T> T integrator<T>::reiterative_error(const std::vector<T> &sol1, const std::vector<T> &sol2) const
+template <typename Float>
+Float integrator<Float>::reiterative_error(const std::vector<Float> &sol1, const std::vector<Float> &sol2) const
 {
     const std::uint32_t coeff = ipow(2, m_tableau.order) - 1;
     return embedded_error(sol1, sol2) / coeff;
 }
 
-template <typename T> T integrator<T>::timestep_factor() const
+template <typename Float> Float integrator<Float>::timestep_factor() const
 {
     return SAFETY_FACTOR * std::pow(tolerance / m_error, 1.f / m_tableau.order);
 }
 
-template <typename T> T integrator<T>::error() const
+template <typename Float> Float integrator<Float>::error() const
 {
     return m_error;
 }
-template <typename T> bool integrator<T>::valid() const
+template <typename Float> bool integrator<Float>::valid() const
 {
     return m_valid;
 }
 
-template <typename T> const butcher_tableau<T> &integrator<T>::tableau() const
+template <typename Float> const butcher_tableau<Float> &integrator<Float>::tableau() const
 {
     return m_tableau;
 }
 
-template <typename T> void integrator<T>::tableau(const butcher_tableau<T> &tableau)
+template <typename Float> void integrator<Float>::tableau(const butcher_tableau<Float> &tableau)
 {
     m_tableau = tableau;
     state.set_stages(tableau.stages);

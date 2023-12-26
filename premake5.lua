@@ -21,7 +21,6 @@ kind "StaticLib"
 
 targetdir("bin/" .. outputdir)
 objdir("build/" .. outputdir)
-removedefines "YAML_CPP_GLM_COMPAT"
 
 files {
    "src/**.cpp",

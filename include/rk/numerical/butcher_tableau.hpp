@@ -6,19 +6,20 @@
 
 namespace rk
 {
-template <typename T> struct butcher_tableau
+template <typename Float> struct butcher_tableau
 {
     butcher_tableau() = default;
-    butcher_tableau(const std::vector<T> &alpha, const std::vector<std::vector<T>> &beta, const std::vector<T> &coefs,
-                    std::uint32_t stages, std::uint32_t order);
+    butcher_tableau(const std::vector<Float> &alpha, const std::vector<std::vector<Float>> &beta,
+                    const std::vector<Float> &coefs, std::uint32_t stages, std::uint32_t order);
 
-    butcher_tableau(const std::vector<T> &alpha, const std::vector<std::vector<T>> &beta, const std::vector<T> &coefs1,
-                    const std::vector<T> &coefs2, std::uint32_t stages, std::uint32_t order);
+    butcher_tableau(const std::vector<Float> &alpha, const std::vector<std::vector<Float>> &beta,
+                    const std::vector<Float> &coefs1, const std::vector<Float> &coefs2, std::uint32_t stages,
+                    std::uint32_t order);
 
-    std::vector<T> alpha;
-    std::vector<T> coefs1;
-    std::vector<T> coefs2;
-    std::vector<std::vector<T>> beta;
+    std::vector<Float> alpha;
+    std::vector<Float> coefs1;
+    std::vector<Float> coefs2;
+    std::vector<std::vector<Float>> beta;
 
     bool embedded;
     std::uint32_t stages;
@@ -34,27 +35,29 @@ template <typename T> struct butcher_tableau
     static const butcher_tableau rkf78;
 };
 
-template <typename T> const butcher_tableau<T> butcher_tableau<T>::rk1 = {{}, {}, {1.f}, 1, 1};
-template <typename T> const butcher_tableau<T> butcher_tableau<T>::rk2 = {{1.f}, {{1.f}}, {0.5f, 0.5f}, 2, 2};
-template <typename T>
-const butcher_tableau<T> butcher_tableau<T>::rk4 = {
+template <typename Float> const butcher_tableau<Float> butcher_tableau<Float>::rk1 = {{}, {}, {1.f}, 1, 1};
+template <typename Float>
+const butcher_tableau<Float> butcher_tableau<Float>::rk2 = {{1.f}, {{1.f}}, {0.5f, 0.5f}, 2, 2};
+template <typename Float>
+const butcher_tableau<Float> butcher_tableau<Float>::rk4 = {
     {0.5f, 0.5f, 1.f}, {{0.5f}, {0.f, 0.5f}, {0.f, 0.f, 1.f}}, {1.f / 6.f, 1.f / 3.f, 1.f / 3.f, 1.f / 6.f}, 4, 4};
 
-template <typename T>
-const butcher_tableau<T> butcher_tableau<T>::rk38 = {{1.f / 3.f, 2.f / 3.f, 1.f},
-                                                     {
-                                                         {1.f / 3.f},
-                                                         {-1.f / 3.f, 1.f},
-                                                         {1.f, -1.f, 1.f},
-                                                     },
-                                                     {1.f / 8.f, 3.f / 8.f, 3.f / 8.f, 1.f / 8.f},
-                                                     4,
-                                                     4};
+template <typename Float>
+const butcher_tableau<Float> butcher_tableau<Float>::rk38 = {{1.f / 3.f, 2.f / 3.f, 1.f},
+                                                             {
+                                                                 {1.f / 3.f},
+                                                                 {-1.f / 3.f, 1.f},
+                                                                 {1.f, -1.f, 1.f},
+                                                             },
+                                                             {1.f / 8.f, 3.f / 8.f, 3.f / 8.f, 1.f / 8.f},
+                                                             4,
+                                                             4};
 
-template <typename T> const butcher_tableau<T> butcher_tableau<T>::rkf12 = {{1}, {{1}}, {0.5f, 0.5f}, {1.f, 0.f}, 2, 2};
+template <typename Float>
+const butcher_tableau<Float> butcher_tableau<Float>::rkf12 = {{1}, {{1}}, {0.5f, 0.5f}, {1.f, 0.f}, 2, 2};
 
-template <typename T>
-const butcher_tableau<T> butcher_tableau<T>::rkf45 = {
+template <typename Float>
+const butcher_tableau<Float> butcher_tableau<Float>::rkf45 = {
     {0.25f, 3.f / 8.f, 12.f / 13.f, 1.f, 0.5f},
     {{0.25f},
      {3.f / 32.f, 9.f / 32.f},
@@ -66,8 +69,8 @@ const butcher_tableau<T> butcher_tableau<T>::rkf45 = {
     6,
     5};
 
-template <typename T>
-const butcher_tableau<T> butcher_tableau<T>::rkfck45 = {
+template <typename Float>
+const butcher_tableau<Float> butcher_tableau<Float>::rkfck45 = {
     {0.2f, 0.3f, 0.6f, 1.f, 7.f / 8.f},
     {{0.2f},
      {3.f / 40.f, 9.f / 40.f},
@@ -79,8 +82,8 @@ const butcher_tableau<T> butcher_tableau<T>::rkfck45 = {
     6,
     5};
 
-template <typename T>
-const butcher_tableau<T> butcher_tableau<T>::rkf78 = {
+template <typename Float>
+const butcher_tableau<Float> butcher_tableau<Float>::rkf78 = {
     {2.f / 27.f, 1.f / 9.f, 1.f / 6.f, 5.f / 12.f, 0.5f, 5.f / 6.f, 1.f / 6.f, 2.f / 3.f, 1.f / 3.f, 1.f, 0.f, 1.f},
     {{2.f / 27.f},
      {1.f / 36.f, 1.f / 12.f},

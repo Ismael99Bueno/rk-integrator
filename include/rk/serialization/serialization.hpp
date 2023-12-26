@@ -1,10 +1,6 @@
 #pragma once
 
-#include "rk/numerical/timestep.hpp"
-#include "rk/numerical/butcher_tableau.hpp"
 #include "rk/integration/integrator.hpp"
-#include "rk/integration/state.hpp"
-
 #include "kit/serialization/yaml/codec.hpp"
 
 template <typename T> struct kit::yaml::codec<rk::timestep<T>>
@@ -20,7 +16,7 @@ template <typename T> struct kit::yaml::codec<rk::timestep<T>>
     }
     static bool decode(const YAML::Node &node, rk::timestep<T> &ts)
     {
-        if (!node.IsDefined() || !node.size() != 4)
+        if (!node.IsMap() || !node.size() != 4)
             return false;
         ts.value = node["Value"].as<T>();
         ts.min = node["Min"].as<T>();

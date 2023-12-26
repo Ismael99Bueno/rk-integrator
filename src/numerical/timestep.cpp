@@ -4,27 +4,28 @@
 
 namespace rk
 {
-template <typename T> timestep<T>::timestep(const T value) : value(value), limited(false)
+template <typename Float> timestep<Float>::timestep(const Float value) : value(value), limited(false)
 {
 }
-template <typename T>
-timestep<T>::timestep(const T value, const T min, const T max) : value(value), min(min), max(max), limited(true)
+template <typename Float>
+timestep<Float>::timestep(const Float value, const Float min, const Float max)
+    : value(value), min(min), max(max), limited(true)
 {
 }
-template <typename T> bool timestep<T>::off_bounds() const
+template <typename Float> bool timestep<Float>::off_bounds() const
 {
     return limited && (too_small() || too_big());
 }
-template <typename T> bool timestep<T>::too_small() const
+template <typename Float> bool timestep<Float>::too_small() const
 {
     return limited && value < min;
 }
-template <typename T> bool timestep<T>::too_big() const
+template <typename Float> bool timestep<Float>::too_big() const
 {
     return limited && value > max;
 }
 
-template <typename T> void timestep<T>::clamp()
+template <typename Float> void timestep<Float>::clamp()
 {
     value = std::clamp(value, min, max);
 }

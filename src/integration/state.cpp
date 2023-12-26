@@ -3,78 +3,78 @@
 
 namespace rk
 {
-template <typename T>
-state<T>::state(const std::vector<T> &vars, const std::uint32_t stages) : m_vars(vars), m_kvec(stages)
+template <typename Float>
+state<Float>::state(const std::vector<Float> &vars, const std::uint32_t stages) : m_vars(vars), m_kvec(stages)
 {
     resize_kvec_length();
 }
 
-template <typename T> void state<T>::push_back(const T elm)
+template <typename Float> void state<Float>::push_back(const Float elm)
 {
     m_vars.push_back(elm);
     resize_kvec_length();
 }
 
-template <typename T> void state<T>::append(std::initializer_list<T> lst)
+template <typename Float> void state<Float>::append(std::initializer_list<Float> lst)
 {
     m_vars.insert(m_vars.end(), lst);
     resize_kvec_length();
 }
 
-template <typename T> void state<T>::resize(const std::size_t size)
+template <typename Float> void state<Float>::resize(const std::size_t size)
 {
     m_vars.resize(size);
     resize_kvec_length();
 }
 
-template <typename T> T state<T>::operator[](std::size_t index) const
+template <typename Float> Float state<Float>::operator[](std::size_t index) const
 {
     return m_vars[index];
 }
-template <typename T> T &state<T>::operator[](std::size_t index)
+template <typename Float> Float &state<Float>::operator[](std::size_t index)
 {
     return m_vars[index];
 }
 
-template <typename T> void state<T>::reserve(const std::size_t capacity)
+template <typename Float> void state<Float>::reserve(const std::size_t capacity)
 {
     m_vars.reserve(capacity);
     m_vars.reserve(capacity);
-    for (std::vector<T> &v : m_kvec)
+    for (std::vector<Float> &v : m_kvec)
         v.reserve(capacity);
 }
 
-template <typename T> void state<T>::clear()
+template <typename Float> void state<Float>::clear()
 {
     m_vars.clear();
-    for (std::vector<T> &v : m_kvec)
+    for (std::vector<Float> &v : m_kvec)
         v.clear();
 }
 
-template <typename T> void state<T>::resize_kvec_length()
+template <typename Float> void state<Float>::resize_kvec_length()
 {
-    for (std::vector<T> &v : m_kvec)
+    for (std::vector<Float> &v : m_kvec)
         v.resize(m_vars.size());
 }
 
-template <typename T> void state<T>::set_stages(const std::uint32_t stages)
+template <typename Float> void state<Float>::set_stages(const std::uint32_t stages)
 {
     m_kvec.resize(stages);
     resize_kvec_length();
 }
 
-template <typename T> const std::vector<T> &state<T>::vars() const
+template <typename Float> const std::vector<Float> &state<Float>::vars() const
 {
     return m_vars;
 }
 
-template <typename T> void state<T>::vars(const std::vector<T> &vars)
+template <typename Float> void state<Float>::vars(const std::vector<Float> &vars)
 {
     m_vars = vars;
     resize_kvec_length();
 }
 
-template <typename T> std::size_t state<T>::size() const
+template <typename Float> std::size_t state<Float>::size() const
 {
     return m_vars.size();
 }

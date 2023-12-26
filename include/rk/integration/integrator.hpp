@@ -9,19 +9,19 @@
 
 namespace rk
 {
-template <typename T> class integrator final
+template <typename Float> class integrator final
 {
   public:
-    static inline constexpr T TOL_PART = 256.f;
+    static inline constexpr Float TOL_PART = 256.f;
 
-    integrator(const timestep<T> &ts = {1.e-3f}, const butcher_tableau<T> &bt = butcher_tableau<T>::rk4,
-               const std::vector<T> &vars = {}, T tolerance = 1e-4f);
+    integrator(const timestep<Float> &ts = {1.e-3f}, const butcher_tableau<Float> &bt = butcher_tableau<Float>::rk4,
+               const std::vector<Float> &vars = {}, Float tolerance = 1e-4f);
 
-    rk::state<T> state;
-    timestep<T> ts;
+    rk::state<Float> state;
+    timestep<Float> ts;
 
-    T tolerance;
-    T elapsed = 0.f;
+    Float tolerance;
+    Float elapsed = 0.f;
 
     template <typename ODE> bool raw_forward(ODE &ode)
     {
@@ -31,12 +31,12 @@ template <typename T> class integrator final
         if (ts.limited)
             ts.clamp();
 
-        std::vector<T> &vars = state.m_vars;
+        std::vector<Float> &vars = state.m_vars;
         update_kvec(elapsed, ts.value, vars, ode);
 
         if (m_tableau.embedded)
         {
-            const std::vector<T> aux_state = generate_solution(ts.value, vars, m_tableau.coefs2);
+            const std::vector<Float> aux_state = generate_solution(ts.value, vars, m_tableau.coefs2);
             vars = generate_solution(ts.value, vars, m_tableau.coefs1);
             m_error = embedded_error(vars, aux_state);
         }
@@ -64,11 +64,11 @@ template <typename T> class integrator final
 
         for (;;)
         {
-            std::vector<T> &vars = state.m_vars;
-            std::vector<T> sol1 = vars;
+            std::vector<Float> &vars = state.m_vars;
+            std::vector<Float> sol1 = vars;
             update_kvec(elapsed, ts.value, vars, ode);
 
-            const std::vector<T> sol2 = generate_solution(ts.value, vars, m_tableau.coefs1);
+            const std::vector<Float> sol2 = generate_solution(ts.value, vars, m_tableau.coefs1);
             for (std::uint32_t i = 0; i < reiterations; i++)
             {
                 update_kvec(elapsed, ts.value / reiterations, sol1, ode);
@@ -106,10 +106,10 @@ template <typename T> class integrator final
 
         for (;;)
         {
-            std::vector<T> &vars = state.m_vars;
+            std::vector<Float> &vars = state.m_vars;
             update_kvec(time, ts.value, vars, ode);
-            const std::vector<T> sol2 = generate_solution(ts.value, vars, m_tableau.coefs2);
-            const std::vector<T> sol1 = generate_solution(ts.value, vars, m_tableau.coefs1);
+            const std::vector<Float> sol2 = generate_solution(ts.value, vars, m_tableau.coefs2);
+            const std::vector<Float> sol1 = generate_solution(ts.value, vars, m_tableau.coefs1);
             m_error = embedded_error(sol1, sol2);
 
             const bool too_small = ts.too_small();
@@ -129,32 +129,32 @@ template <typename T> class integrator final
         return m_valid;
     }
 
-    const butcher_tableau<T> &tableau() const;
-    void tableau(const butcher_tableau<T> &tableau);
+    const butcher_tableau<Float> &tableau() const;
+    void tableau(const butcher_tableau<Float> &tableau);
 
-    T error() const;
+    Float error() const;
     bool valid() const;
 
   private:
-    butcher_tableau<T> m_tableau;
-    T m_error = 0.f;
+    butcher_tableau<Float> m_tableau;
+    Float m_error = 0.f;
     bool m_valid = true;
 
-    template <typename ODE> void update_kvec(T time, T timestep, const std::vector<T> &vars, ODE &ode)
+    template <typename ODE> void update_kvec(Float time, Float timestep, const std::vector<Float> &vars, ODE &ode)
     {
         KIT_PERF_FUNCTION()
         auto &kvec = state.m_kvec;
         KIT_ASSERT_CRITICAL(vars.size() == kvec[0].size(),
                             "State and k-vectors size mismatch! - vars size: {0}, k-vectors size: {1}", vars.size(),
                             kvec[0].size())
-        std::vector<T> aux_vars(vars.size());
+        std::vector<Float> aux_vars(vars.size());
 
         kvec[0] = ode(time, timestep, vars);
         for (std::uint32_t i = 1; i < m_tableau.stages; i++)
         {
             for (std::size_t j = 0; j < vars.size(); j++)
             {
-                T k_sum = 0.f;
+                Float k_sum = 0.f;
                 for (std::uint32_t k = 0; k < i; k++)
                     k_sum += m_tableau.beta[i - 1][k] * kvec[k][j];
                 aux_vars[j] = vars[j] + k_sum * timestep;
@@ -163,11 +163,12 @@ template <typename T> class integrator final
         }
     }
 
-    std::vector<T> generate_solution(T timestep, const std::vector<T> &vars, const std::vector<T> &coefs);
+    std::vector<Float> generate_solution(Float timestep, const std::vector<Float> &vars,
+                                         const std::vector<Float> &coefs);
 
-    static T embedded_error(const std::vector<T> &sol1, const std::vector<T> &sol2);
-    T reiterative_error(const std::vector<T> &sol1, const std::vector<T> &sol2) const;
-    T timestep_factor() const;
+    static Float embedded_error(const std::vector<Float> &sol1, const std::vector<Float> &sol2);
+    Float reiterative_error(const std::vector<Float> &sol1, const std::vector<Float> &sol2) const;
+    Float timestep_factor() const;
 };
 
 } // namespace rk

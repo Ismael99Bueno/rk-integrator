@@ -5,25 +5,25 @@
 
 namespace rk
 {
-template <typename T> class state
+template <typename Float> class state
 {
   public:
     state() = default;
-    state(const std::vector<T> &vars, std::uint32_t stages);
+    state(const std::vector<Float> &vars, std::uint32_t stages);
 
-    void push_back(T elm);
-    void append(std::initializer_list<T> lst);
+    void push_back(Float elm);
+    void append(std::initializer_list<Float> lst);
 
     void resize(std::size_t size);
     void reserve(std::size_t capacity);
 
     void clear();
 
-    T operator[](std::size_t index) const;
-    T &operator[](std::size_t index);
+    Float operator[](std::size_t index) const;
+    Float &operator[](std::size_t index);
 
-    const std::vector<T> &vars() const;
-    void vars(const std::vector<T> &vars);
+    const std::vector<Float> &vars() const;
+    void vars(const std::vector<Float> &vars);
 
     std::size_t size() const;
 
@@ -31,8 +31,8 @@ template <typename T> class state
     void resize_kvec_length();
     void set_stages(std::uint32_t stages);
 
-    std::vector<T> m_vars;
-    std::vector<std::vector<T>> m_kvec;
+    std::vector<Float> m_vars;
+    std::vector<std::vector<Float>> m_kvec;
 
     template <typename U> friend class integrator;
 };

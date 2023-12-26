@@ -2,15 +2,15 @@
 
 namespace rk
 {
-template <typename T> struct timestep
+template <typename Float> struct timestep
 {
     timestep() = default;
-    timestep(T value);
-    timestep(T value, T min, T max);
+    timestep(Float value);
+    timestep(Float value, Float min, Float max);
 
-    T value;
-    T min;
-    T max;
+    Float value;
+    Float min;
+    Float max;
 
     bool limited;
 
