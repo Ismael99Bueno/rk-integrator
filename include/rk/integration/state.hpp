@@ -8,15 +8,6 @@ namespace rk
 template <typename T> class state
 {
   public:
-#ifdef KIT_USE_YAML_CPP
-    class serializer : public kit::serializer<state>
-    {
-      public:
-        YAML::Node encode(const state &tb) const override;
-        bool decode(const YAML::Node &node, state &tb) const override;
-    };
-#endif
-
     state() = default;
     state(const std::vector<T> &vars, std::uint32_t stages);
 

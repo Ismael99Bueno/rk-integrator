@@ -8,15 +8,6 @@ namespace rk
 {
 template <typename T> struct butcher_tableau
 {
-#ifdef KIT_USE_YAML_CPP
-    class serializer : public kit::serializer<butcher_tableau>
-    {
-      public:
-        YAML::Node encode(const butcher_tableau &tb) const override;
-        bool decode(const YAML::Node &node, butcher_tableau &tb) const override;
-    };
-#endif
-
     butcher_tableau() = default;
     butcher_tableau(const std::vector<T> &alpha, const std::vector<std::vector<T>> &beta, const std::vector<T> &coefs,
                     std::uint32_t stages, std::uint32_t order);

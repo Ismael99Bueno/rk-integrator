@@ -1,8 +1,8 @@
 #pragma once
 
-#include "rk/butcher_tableau.hpp"
-#include "rk/state.hpp"
-#include "rk/timestep.hpp"
+#include "rk/numerical/butcher_tableau.hpp"
+#include "rk/integration/state.hpp"
+#include "rk/numerical/timestep.hpp"
 #include "kit/profile/perf.hpp"
 #include "kit/debug/log.hpp"
 #include <cstdint>
@@ -12,15 +12,6 @@ namespace rk
 template <typename T> class integrator final
 {
   public:
-#ifdef KIT_USE_YAML_CPP
-    class serializer : public kit::serializer<integrator>
-    {
-      public:
-        YAML::Node encode(const integrator &integ) const override;
-        bool decode(const YAML::Node &node, integrator &integ) const override;
-    };
-#endif
-
     static inline constexpr T TOL_PART = 256.f;
 
     integrator(const timestep<T> &ts = {1.e-3f}, const butcher_tableau<T> &bt = butcher_tableau<T>::rk4,

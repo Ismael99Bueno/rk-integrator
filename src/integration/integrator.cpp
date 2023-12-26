@@ -1,5 +1,5 @@
-#include "rk/pch.hpp"
-#include "rk/integrator.hpp"
+#include "rk/internal/pch.hpp"
+#include "rk/integration/integrator.hpp"
 #include <cmath>
 #define SAFETY_FACTOR 0.85f
 
@@ -85,37 +85,6 @@ template <typename T> void integrator<T>::tableau(const butcher_tableau<T> &tabl
     m_tableau = tableau;
     state.set_stages(tableau.stages);
 }
-
-#ifdef KIT_USE_YAML_CPP
-template <typename T> YAML::Node integrator<T>::serializer::encode(const integrator &integ) const
-{
-    YAML::Node node;
-    node["Tableau"] = integ.tableau();
-    node["State"] = integ.state;
-    node["Tolerance"] = integ.tolerance;
-    node["Elapsed"] = integ.elapsed;
-    node["Timestep"] = integ.ts.value;
-    node["Min timestep"] = integ.ts.min;
-    node["Max timestep"] = integ.ts.max;
-    node["Limited timestep"] = integ.ts.limited;
-    return node;
-}
-template <typename T> bool integrator<T>::serializer::decode(const YAML::Node &node, integrator &integ) const
-{
-    if (!node.IsMap() || node.size() != 8)
-        return false;
-
-    integ.tableau(node["Tableau"].as<rk::butcher_tableau<T>>());
-    integ.state = node["State"].as<rk::state<T>>();
-    integ.tolerance = node["Tolerance"].as<T>();
-    integ.elapsed = node["Elapsed"].as<T>();
-    integ.ts.value = node["Timestep"].as<T>();
-    integ.ts.min = node["Min timestep"].as<T>();
-    integ.ts.max = node["Max timestep"].as<T>();
-    integ.ts.limited = node["Limited timestep"].as<bool>();
-    return true;
-}
-#endif
 
 template class integrator<float>;
 template class integrator<double>;
