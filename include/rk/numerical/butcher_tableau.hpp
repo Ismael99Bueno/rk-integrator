@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <cstdint>
-#include "kit/interface/serialization.hpp"
 
 namespace rk
 {

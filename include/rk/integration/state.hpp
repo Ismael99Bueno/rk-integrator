@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include "kit/interface/serialization.hpp"
 
 namespace rk
 {
