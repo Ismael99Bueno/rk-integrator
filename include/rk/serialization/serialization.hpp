@@ -17,7 +17,7 @@ template <typename T> struct kit::yaml::codec<rk::timestep<T>>
     }
     static bool decode(const YAML::Node &node, rk::timestep<T> &ts)
     {
-        if (!node.IsMap() || !node.size() != 4)
+        if (!node.IsMap() || node.size() != 4)
             return false;
         ts.value = node["Value"].as<T>();
         ts.min = node["Min"].as<T>();
