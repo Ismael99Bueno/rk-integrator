@@ -9,10 +9,10 @@ template <typename T> struct kit::yaml::codec<rk::timestep<T>>
     static YAML::Node encode(const rk::timestep<T> &ts)
     {
         YAML::Node node;
-        node["Value"] = integ.ts.value;
-        node["Min"] = integ.ts.min;
-        node["Max"] = integ.ts.max;
-        node["Limited"] = integ.ts.limited;
+        node["Value"] = ts.value;
+        node["Min"] = ts.min;
+        node["Max"] = ts.max;
+        node["Limited"] = ts.limited;
         return node;
     }
     static bool decode(const YAML::Node &node, rk::timestep<T> &ts)
@@ -93,32 +93,17 @@ template <typename T> struct kit::yaml::codec<rk::state<T>>
         YAML::Node node;
         node["State variables"] = st.vars();
         node["State variables"].SetStyle(YAML::EmitterStyle::Flow);
-        for (std::size_t i = 0; i < st.m_kvec.size(); i++)
-        {
-            YAML::Node child;
-            child = st.m_kvec[i];
-            node["K-Vectors"].push_back(child);
-            node["K-Vectors"][i].SetStyle(YAML::EmitterStyle::Flow);
-        }
         return node;
     }
     static bool decode(const YAML::Node &node, rk::state<T> &st)
     {
-        if (!node.IsMap() || node.size() != 2)
+        if (!node.IsMap() || node.size() != 1)
             return false;
 
         std::vector<T> vars;
-        std::vector<std::vector<T>> k_vec;
-        for (const auto &n1 : node["K-Vectors"])
-        {
-            auto &v1 = k_vec.emplace_back();
-            for (const auto &n2 : n1)
-                v1.push_back(n2.as<T>());
-        }
         for (const auto &n : node["State variables"])
             vars.push_back(n.as<T>());
-        st.m_vars = vars;
-        st.m_kvec = k_vec;
+        st.vars(vars);
 
         return true;
     }
@@ -140,8 +125,8 @@ template <typename T> struct kit::yaml::codec<rk::integrator<T>>
         if (!node.IsMap() || node.size() != 5)
             return false;
 
-        integ.tableau(node["Tableau"].as<rk::butcher_tableau<T>>());
         integ.state = node["State"].as<rk::state<T>>();
+        integ.tableau(node["Tableau"].as<rk::butcher_tableau<T>>());
         integ.tolerance = node["Tolerance"].as<T>();
         integ.elapsed = node["Elapsed"].as<T>();
         integ.ts = node["Timestep"].as<rk::timestep<T>>();
