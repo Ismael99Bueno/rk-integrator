@@ -107,7 +107,7 @@ template <typename Float> class integrator final
         for (;;)
         {
             std::vector<Float> &vars = state.m_vars;
-            update_kvec(time, ts.value, vars, ode);
+            update_kvec(elapsed, ts.value, vars, ode);
             const std::vector<Float> sol2 = generate_solution(ts.value, vars, m_tableau.coefs2);
             const std::vector<Float> sol1 = generate_solution(ts.value, vars, m_tableau.coefs1);
             m_error = embedded_error(sol1, sol2);
