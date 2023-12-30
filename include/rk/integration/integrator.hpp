@@ -22,7 +22,6 @@ template <typename Float> class integrator final
 
     Float tolerance;
     Float elapsed = 0.f;
-    bool semi_implicit = false;
 
     template <typename ODE> bool raw_forward(ODE &ode)
     {
@@ -151,10 +150,6 @@ template <typename Float> class integrator final
         std::vector<Float> aux_vars(vars.size());
 
         kvec[0] = ode(time, timestep, vars);
-        if (semi_implicit)
-            for (std::size_t j = 0; j < vars.size() / 2; j++)
-                kvec[0][j] += kvec[0][j + vars.size() / 2] * timestep;
-
         for (std::uint32_t i = 1; i < m_tableau.stages; i++)
         {
             for (std::size_t j = 0; j < vars.size(); j++)
@@ -165,9 +160,6 @@ template <typename Float> class integrator final
                 aux_vars[j] = vars[j] + k_sum * timestep;
             }
             kvec[i] = ode(time + m_tableau.alpha[i - 1] * timestep, timestep, aux_vars);
-            if (semi_implicit)
-                for (std::size_t j = 0; j < vars.size() / 2; j++)
-                    kvec[i][j] += kvec[i][j + vars.size() / 2] * timestep;
         }
     }
 

@@ -115,7 +115,6 @@ template <typename Float> struct kit::yaml::codec<rk::integrator<Float>>
         YAML::Node node;
         node["Tableau"] = integ.tableau();
         node["State"] = integ.state;
-        node["Semi-implicit"] = integ.semi_implicit;
         node["Tolerance"] = integ.tolerance;
         node["Elapsed"] = integ.elapsed;
         node["Timestep"] = integ.ts;
@@ -123,12 +122,11 @@ template <typename Float> struct kit::yaml::codec<rk::integrator<Float>>
     }
     static bool decode(const YAML::Node &node, rk::integrator<Float> &integ)
     {
-        if (!node.IsMap() || node.size() != 6)
+        if (!node.IsMap() || node.size() != 5)
             return false;
 
         integ.state = node["State"].as<rk::state<Float>>();
         integ.tableau(node["Tableau"].as<rk::butcher_tableau<Float>>());
-        integ.semi_implicit = node["Semi-implicit"].as<bool>();
         integ.tolerance = node["Tolerance"].as<Float>();
         integ.elapsed = node["Elapsed"].as<Float>();
         integ.ts = node["Timestep"].as<rk::timestep<Float>>();
