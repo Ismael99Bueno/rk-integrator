@@ -142,6 +142,7 @@ template <typename Float> class integrator final
 
     template <typename ODE> void update_kvec(Float time, Float timestep, const std::vector<Float> &vars, ODE &ode)
     {
+        KIT_ASSERT_ERROR(timestep >= 0.f, "Timestep must be non-negative")
         KIT_PERF_FUNCTION()
         auto &kvec = state.m_kvec;
         KIT_ASSERT_CRITICAL(vars.size() == kvec[0].size(),
