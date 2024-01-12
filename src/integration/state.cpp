@@ -29,10 +29,12 @@ template <typename Float> void state<Float>::resize(const std::size_t size)
 
 template <typename Float> Float state<Float>::operator[](std::size_t index) const
 {
+    KIT_ASSERT_ERROR(index < m_vars.size(), "Index exceeds container size: {0}", index)
     return m_vars[index];
 }
 template <typename Float> Float &state<Float>::operator[](std::size_t index)
 {
+    KIT_ASSERT_ERROR(index < m_vars.size(), "Index exceeds container size: {0}", index)
     return m_vars[index];
 }
 
