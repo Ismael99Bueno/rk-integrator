@@ -1,10 +1,11 @@
 #pragma once
 
+#include "kit/utility/type_constraints.hpp"
 #include <vector>
 
 namespace rk
 {
-template <typename Float> class state
+template <kit::FloatingPoint Float> class state
 {
   public:
     state() = default;
@@ -33,6 +34,6 @@ template <typename Float> class state
     std::vector<Float> m_vars;
     std::vector<std::vector<Float>> m_kvec;
 
-    template <typename U> friend class integrator;
+    template <kit::FloatingPoint U> friend class integrator;
 };
 } // namespace rk

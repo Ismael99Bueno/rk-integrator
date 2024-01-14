@@ -3,7 +3,7 @@
 
 namespace rk
 {
-template <typename Float>
+template <kit::FloatingPoint Float>
 butcher_tableau<Float>::butcher_tableau(const std::vector<Float> &alpha, const std::vector<std::vector<Float>> &beta,
                                         const std::vector<Float> &coefs, const std::uint32_t stages,
                                         const std::uint32_t order)
@@ -11,7 +11,7 @@ butcher_tableau<Float>::butcher_tableau(const std::vector<Float> &alpha, const s
 {
 }
 
-template <typename Float>
+template <kit::FloatingPoint Float>
 butcher_tableau<Float>::butcher_tableau(const std::vector<Float> &alpha, const std::vector<std::vector<Float>> &beta,
                                         const std::vector<Float> &coefs1, const std::vector<Float> &coefs2,
                                         const std::uint32_t stages, const std::uint32_t order)

@@ -1,8 +1,10 @@
 #pragma once
 
+#include "kit/utility/type_constraints.hpp"
+
 namespace rk
 {
-template <typename Float> struct timestep
+template <kit::FloatingPoint Float> struct timestep
 {
     timestep() = default;
     timestep(Float value);
