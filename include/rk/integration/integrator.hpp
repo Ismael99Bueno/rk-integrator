@@ -3,7 +3,7 @@
 #include "rk/numerical/butcher_tableau.hpp"
 #include "rk/integration/state.hpp"
 #include "rk/numerical/timestep.hpp"
-#include "kit/profile/perf.hpp"
+
 #include "kit/debug/log.hpp"
 #include <cstdint>
 
