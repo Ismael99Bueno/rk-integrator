@@ -7,4 +7,4 @@
 #include <yaml-cpp/yaml.h>
 #endif
 #include "kit/debug/log.hpp"
-#include "kit/profile/perf.hpp"
+#include "kit/profiling/perf.hpp"
