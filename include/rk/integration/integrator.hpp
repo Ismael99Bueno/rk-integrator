@@ -9,7 +9,7 @@
 
 namespace rk
 {
-template <kit::FloatingPoint Float> class integrator final
+template <std::floating_point Float> class integrator final
 {
   public:
     static inline constexpr Float TOL_PART = 256.f;

@@ -5,7 +5,7 @@
 
 namespace rk
 {
-template <kit::FloatingPoint Float> class state
+template <std::floating_point Float> class state
 {
   public:
     state() = default;
@@ -34,6 +34,6 @@ template <kit::FloatingPoint Float> class state
     std::vector<Float> m_vars;
     std::vector<std::vector<Float>> m_kvec;
 
-    template <kit::FloatingPoint U> friend class integrator;
+    template <std::floating_point U> friend class integrator;
 };
 } // namespace rk

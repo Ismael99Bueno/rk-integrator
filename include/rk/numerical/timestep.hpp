@@ -4,7 +4,7 @@
 
 namespace rk
 {
-template <kit::FloatingPoint Float> struct timestep
+template <std::floating_point Float> struct timestep
 {
     timestep() = default;
     timestep(Float value);

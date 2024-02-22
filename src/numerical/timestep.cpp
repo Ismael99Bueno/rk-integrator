@@ -4,28 +4,28 @@
 
 namespace rk
 {
-template <kit::FloatingPoint Float> timestep<Float>::timestep(const Float value) : value(value), limited(false)
+template <std::floating_point Float> timestep<Float>::timestep(const Float value) : value(value), limited(false)
 {
 }
-template <kit::FloatingPoint Float>
+template <std::floating_point Float>
 timestep<Float>::timestep(const Float value, const Float min, const Float max)
     : value(value), min(min), max(max), limited(true)
 {
 }
-template <kit::FloatingPoint Float> bool timestep<Float>::off_bounds() const
+template <std::floating_point Float> bool timestep<Float>::off_bounds() const
 {
     return limited && (too_small() || too_big());
 }
-template <kit::FloatingPoint Float> bool timestep<Float>::too_small() const
+template <std::floating_point Float> bool timestep<Float>::too_small() const
 {
     return limited && value < min;
 }
-template <kit::FloatingPoint Float> bool timestep<Float>::too_big() const
+template <std::floating_point Float> bool timestep<Float>::too_big() const
 {
     return limited && value > max;
 }
 
-template <kit::FloatingPoint Float> void timestep<Float>::clamp()
+template <std::floating_point Float> void timestep<Float>::clamp()
 {
     value = std::clamp(value, min, max);
 }

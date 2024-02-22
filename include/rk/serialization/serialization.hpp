@@ -4,7 +4,7 @@
 #include "rk/integration/integrator.hpp"
 #include "kit/serialization/yaml/codec.hpp"
 
-template <kit::FloatingPoint Float> struct kit::yaml::codec<rk::timestep<Float>>
+template <std::floating_point Float> struct kit::yaml::codec<rk::timestep<Float>>
 {
     static YAML::Node encode(const rk::timestep<Float> &ts)
     {
@@ -27,7 +27,7 @@ template <kit::FloatingPoint Float> struct kit::yaml::codec<rk::timestep<Float>>
     }
 };
 
-template <kit::FloatingPoint Float> struct kit::yaml::codec<rk::butcher_tableau<Float>>
+template <std::floating_point Float> struct kit::yaml::codec<rk::butcher_tableau<Float>>
 {
     static YAML::Node encode(const rk::butcher_tableau<Float> &tb)
     {
@@ -86,7 +86,7 @@ template <kit::FloatingPoint Float> struct kit::yaml::codec<rk::butcher_tableau<
     }
 };
 
-template <kit::FloatingPoint Float> struct kit::yaml::codec<rk::state<Float>>
+template <std::floating_point Float> struct kit::yaml::codec<rk::state<Float>>
 {
     static YAML::Node encode(const rk::state<Float> &st)
     {
@@ -108,7 +108,7 @@ template <kit::FloatingPoint Float> struct kit::yaml::codec<rk::state<Float>>
         return true;
     }
 };
-template <kit::FloatingPoint Float> struct kit::yaml::codec<rk::integrator<Float>>
+template <std::floating_point Float> struct kit::yaml::codec<rk::integrator<Float>>
 {
     static YAML::Node encode(const rk::integrator<Float> &integ)
     {

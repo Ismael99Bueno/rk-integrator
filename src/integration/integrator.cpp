@@ -5,14 +5,14 @@
 
 namespace rk
 {
-template <kit::FloatingPoint Float>
+template <std::floating_point Float>
 integrator<Float>::integrator(const timestep<Float> &ts, const butcher_tableau<Float> &bt,
                               const std::vector<Float> &vars, const Float tolerance)
     : state(vars, bt.stages), ts(ts), tolerance(tolerance), m_tableau(bt)
 {
 }
 
-template <kit::FloatingPoint Float>
+template <std::floating_point Float>
 std::vector<Float> integrator<Float>::generate_solution(const Float timestep, const std::vector<Float> &vars,
                                                         const std::vector<Float> &coefs)
 {
@@ -47,7 +47,7 @@ static std::uint32_t ipow(std::uint32_t base, std::uint32_t exponent)
     return (std::uint32_t)result;
 }
 
-template <kit::FloatingPoint Float>
+template <std::floating_point Float>
 Float integrator<Float>::embedded_error(const std::vector<Float> &sol1, const std::vector<Float> &sol2)
 {
     Float result = 0.0;
@@ -56,33 +56,33 @@ Float integrator<Float>::embedded_error(const std::vector<Float> &sol1, const st
     return result;
 }
 
-template <kit::FloatingPoint Float>
+template <std::floating_point Float>
 Float integrator<Float>::reiterative_error(const std::vector<Float> &sol1, const std::vector<Float> &sol2) const
 {
     const std::uint32_t coeff = ipow(2, m_tableau.order) - 1;
     return embedded_error(sol1, sol2) / coeff;
 }
 
-template <kit::FloatingPoint Float> Float integrator<Float>::timestep_factor() const
+template <std::floating_point Float> Float integrator<Float>::timestep_factor() const
 {
     return SAFETY_FACTOR * std::pow(tolerance / m_error, 1.f / m_tableau.order);
 }
 
-template <kit::FloatingPoint Float> Float integrator<Float>::error() const
+template <std::floating_point Float> Float integrator<Float>::error() const
 {
     return m_error;
 }
-template <kit::FloatingPoint Float> bool integrator<Float>::valid() const
+template <std::floating_point Float> bool integrator<Float>::valid() const
 {
     return m_valid;
 }
 
-template <kit::FloatingPoint Float> const butcher_tableau<Float> &integrator<Float>::tableau() const
+template <std::floating_point Float> const butcher_tableau<Float> &integrator<Float>::tableau() const
 {
     return m_tableau;
 }
 
-template <kit::FloatingPoint Float> void integrator<Float>::tableau(const butcher_tableau<Float> &tableau)
+template <std::floating_point Float> void integrator<Float>::tableau(const butcher_tableau<Float> &tableau)
 {
     m_tableau = tableau;
     state.set_stages(tableau.stages);
