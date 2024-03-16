@@ -5,6 +5,7 @@
 #include "rk/numerical/timestep.hpp"
 
 #include "kit/debug/log.hpp"
+#include "kit/utility/type_constraints.hpp"
 #include <cstdint>
 
 namespace rk
@@ -23,7 +24,8 @@ template <std::floating_point Float> class integrator final
     Float tolerance;
     Float elapsed = 0.f;
 
-    template <typename ODE> bool raw_forward(ODE &ode)
+    template <kit::RetCallable<std::vector<float>, float, float, const std::vector<float> &> ODE>
+    bool raw_forward(ODE &ode)
     {
         KIT_PERF_FUNCTION()
         m_valid = true;
@@ -47,7 +49,8 @@ template <std::floating_point Float> class integrator final
         return m_valid;
     }
 
-    template <typename ODE> bool reiterative_forward(ODE &ode, std::uint32_t reiterations = 2)
+    template <kit::RetCallable<std::vector<float>, float, float, const std::vector<float> &> ODE>
+    bool reiterative_forward(ODE &ode, std::uint32_t reiterations = 2)
     {
         KIT_PERF_FUNCTION()
         KIT_ASSERT_CRITICAL(reiterations >= 2,
@@ -93,7 +96,8 @@ template <std::floating_point Float> class integrator final
         return m_valid;
     }
 
-    template <typename ODE> bool embedded_forward(ODE &ode)
+    template <kit::RetCallable<std::vector<float>, float, float, const std::vector<float> &> ODE>
+    bool embedded_forward(ODE &ode)
     {
         KIT_PERF_FUNCTION()
         KIT_ASSERT_CRITICAL(m_tableau.embedded(),
@@ -140,7 +144,8 @@ template <std::floating_point Float> class integrator final
     Float m_error = 0.f;
     bool m_valid = true;
 
-    template <typename ODE> void update_kvec(Float time, Float timestep, const std::vector<Float> &vars, ODE &ode)
+    template <kit::RetCallable<std::vector<float>, float, float, const std::vector<float> &> ODE>
+    void update_kvec(Float time, Float timestep, const std::vector<Float> &vars, ODE &ode)
     {
         KIT_ASSERT_ERROR(timestep >= 0.f, "Timestep must be non-negative")
         KIT_PERF_FUNCTION()
