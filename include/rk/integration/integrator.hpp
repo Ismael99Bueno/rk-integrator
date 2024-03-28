@@ -63,7 +63,8 @@ template <std::floating_point Float> class integrator final
 
         if (m_error > 0.f)
             ts.value *= timestep_factor();
-        ts.clamp();
+        if (ts.limited)
+            ts.clamp();
 
         for (;;)
         {
@@ -106,7 +107,8 @@ template <std::floating_point Float> class integrator final
 
         if (m_error > 0.f)
             ts.value *= timestep_factor();
-        ts.clamp();
+        if (ts.limited)
+            ts.clamp();
 
         for (;;)
         {
