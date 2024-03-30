@@ -15,7 +15,7 @@ template <std::floating_point Float> class integrator final
   public:
     static inline constexpr Float TOL_PART = 256.f;
 
-    integrator(const timestep<Float> &ts = {1.e-3f}, const butcher_tableau<Float> &bt = butcher_tableau<Float>::rk4,
+    integrator(const butcher_tableau<Float> &bt, const timestep<Float> &ts = {1.e-3f},
                const std::vector<Float> &vars = {}, Float tolerance = 1e-4f);
 
     rk::state<Float> state;

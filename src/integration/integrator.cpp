@@ -6,7 +6,7 @@
 namespace rk
 {
 template <std::floating_point Float>
-integrator<Float>::integrator(const timestep<Float> &ts, const butcher_tableau<Float> &bt,
+integrator<Float>::integrator(const butcher_tableau<Float> &bt, const timestep<Float> &ts,
                               const std::vector<Float> &vars, const Float tolerance)
     : state(vars, bt.stages), ts(ts), tolerance(tolerance), m_tableau(bt)
 {
