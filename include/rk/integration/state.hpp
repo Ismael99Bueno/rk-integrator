@@ -22,17 +22,22 @@ template <std::floating_point Float> class state
     Float operator[](std::size_t index) const;
     Float &operator[](std::size_t index);
 
+    Float operator()(std::uint32_t stage, std::size_t index) const;
+    Float &operator()(std::uint32_t stage, std::size_t index);
+
     const std::vector<Float> &vars() const;
     void vars(const std::vector<Float> &vars);
 
     std::size_t size() const;
+    std::uint32_t stages() const;
 
   private:
-    void resize_kvec_length();
-    void set_stages(std::uint32_t stages);
+    void resize_kvecs();
+    void stages(std::uint32_t stages);
 
     std::vector<Float> m_vars;
-    std::vector<std::vector<Float>> m_kvec;
+    std::vector<Float> m_kvec;
+    std::uint32_t m_stages;
 
     template <std::floating_point U> friend class integrator;
 };

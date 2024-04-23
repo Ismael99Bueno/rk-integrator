@@ -154,23 +154,31 @@ template <std::floating_point Float> class integrator final
     {
         KIT_ASSERT_ERROR(timestep >= 0.f, "Timestep must be non-negative")
         KIT_PERF_FUNCTION()
-        auto &kvec = state.m_kvec;
-        KIT_ASSERT_CRITICAL(vars.size() == kvec[0].size(),
-                            "State and k-vectors size mismatch! - vars size: {0}, k-vectors size: {1}", vars.size(),
-                            kvec[0].size())
+        KIT_ASSERT_ERROR(vars.size() * m_tableau.stages == state.m_kvec.size(),
+                         "State and k-vectors size mismatch! - vars size: {0}, k-vectors size: {1}", vars.size(),
+                         state.m_kvec.size() / m_tableau.stages)
         std::vector<Float> aux_vars(vars.size());
 
-        kvec[0] = ode(time, timestep, vars);
+        auto state_derivative = ode(time, timestep, vars);
+        KIT_ASSERT_ERROR(state_derivative.size() == vars.size(),
+                         "ODE function must return a vector of the same size as the state vector")
+        for (std::size_t i = 0; i < vars.size(); i++)
+            state(0, i) = state_derivative[i];
+
         for (std::uint32_t i = 1; i < m_tableau.stages; i++)
         {
             for (std::size_t j = 0; j < vars.size(); j++)
             {
                 Float k_sum = 0.f;
                 for (std::uint32_t k = 0; k < i; k++)
-                    k_sum += m_tableau.beta[i - 1][k] * kvec[k][j];
+                    k_sum += m_tableau.beta[i - 1][k] * state(k, j);
                 aux_vars[j] = vars[j] + k_sum * timestep;
             }
-            kvec[i] = ode(time + m_tableau.alpha[i - 1] * timestep, timestep, aux_vars);
+            state_derivative = ode(time + m_tableau.alpha[i - 1] * timestep, timestep, aux_vars);
+            KIT_ASSERT_ERROR(state_derivative.size() == vars.size(),
+                             "ODE function must return a vector of the same size as the state vector")
+            for (std::size_t j = 0; j < vars.size(); j++)
+                state(i, j) = state_derivative[j];
         }
     }
 

@@ -23,7 +23,7 @@ std::vector<Float> integrator<Float>::generate_solution(const Float timestep, co
     {
         Float sum = 0.0;
         for (std::uint8_t i = 0; i < m_tableau.stages; i++)
-            sum += coefs[i] * state.m_kvec[i][j];
+            sum += coefs[i] * state(i, j);
         m_valid &= !std::isnan(sum);
 
         sol.push_back(vars[j] + sum * timestep);
@@ -85,7 +85,7 @@ template <std::floating_point Float> const butcher_tableau<Float> &integrator<Fl
 template <std::floating_point Float> void integrator<Float>::tableau(const butcher_tableau<Float> &tableau)
 {
     m_tableau = tableau;
-    state.set_stages(tableau.stages);
+    state.stages(tableau.stages);
 }
 
 template class integrator<float>;

@@ -4,27 +4,28 @@
 namespace rk
 {
 template <std::floating_point Float>
-state<Float>::state(const std::vector<Float> &vars, const std::uint32_t stages) : m_vars(vars), m_kvec(stages)
+state<Float>::state(const std::vector<Float> &vars, const std::uint32_t stages)
+    : m_vars(vars), m_kvec(stages), m_stages(stages)
 {
-    resize_kvec_length();
+    resize_kvecs();
 }
 
 template <std::floating_point Float> void state<Float>::push_back(const Float elm)
 {
     m_vars.push_back(elm);
-    resize_kvec_length();
+    resize_kvecs();
 }
 
 template <std::floating_point Float> void state<Float>::append(std::initializer_list<Float> lst)
 {
     m_vars.insert(m_vars.end(), lst);
-    resize_kvec_length();
+    resize_kvecs();
 }
 
 template <std::floating_point Float> void state<Float>::resize(const std::size_t size)
 {
     m_vars.resize(size);
-    resize_kvec_length();
+    resize_kvecs();
 }
 
 template <std::floating_point Float> Float state<Float>::operator[](std::size_t index) const
@@ -38,31 +39,46 @@ template <std::floating_point Float> Float &state<Float>::operator[](std::size_t
     return m_vars[index];
 }
 
+template <std::floating_point Float>
+Float state<Float>::operator()(const std::uint32_t stage, const std::size_t index) const
+{
+    KIT_ASSERT_ERROR(stage < m_stages, "Stage exceeds container size: {0}", stage)
+    KIT_ASSERT_ERROR(index < m_vars.size(), "Index exceeds container size: {0}", index)
+    return m_kvec[stage * m_vars.size() + index];
+}
+
+template <std::floating_point Float> Float &state<Float>::operator()(const std::uint32_t stage, const std::size_t index)
+{
+    KIT_ASSERT_ERROR(stage < m_stages, "Stage exceeds container size: {0}", stage)
+    KIT_ASSERT_ERROR(index < m_vars.size(), "Index exceeds container size: {0}", index)
+    return m_kvec[stage * m_vars.size() + index];
+}
+
 template <std::floating_point Float> void state<Float>::reserve(const std::size_t capacity)
 {
     m_vars.reserve(capacity);
-    m_vars.reserve(capacity);
-    for (std::vector<Float> &v : m_kvec)
-        v.reserve(capacity);
+    m_kvec.reserve(capacity * m_stages);
 }
 
 template <std::floating_point Float> void state<Float>::clear()
 {
     m_vars.clear();
-    for (std::vector<Float> &v : m_kvec)
-        v.clear();
+    m_kvec.clear();
 }
 
-template <std::floating_point Float> void state<Float>::resize_kvec_length()
+template <std::floating_point Float> void state<Float>::resize_kvecs()
 {
-    for (std::vector<Float> &v : m_kvec)
-        v.resize(m_vars.size());
+    m_kvec.resize(m_stages * m_vars.size());
 }
 
-template <std::floating_point Float> void state<Float>::set_stages(const std::uint32_t stages)
+template <std::floating_point Float> std::uint32_t state<Float>::stages() const
 {
-    m_kvec.resize(stages);
-    resize_kvec_length();
+    return m_stages;
+}
+template <std::floating_point Float> void state<Float>::stages(const std::uint32_t stages)
+{
+    m_stages = stages;
+    resize_kvecs();
 }
 
 template <std::floating_point Float> const std::vector<Float> &state<Float>::vars() const
@@ -73,7 +89,7 @@ template <std::floating_point Float> const std::vector<Float> &state<Float>::var
 template <std::floating_point Float> void state<Float>::vars(const std::vector<Float> &vars)
 {
     m_vars = vars;
-    resize_kvec_length();
+    resize_kvecs();
 }
 
 template <std::floating_point Float> std::size_t state<Float>::size() const
