@@ -13,6 +13,9 @@ namespace rk
 template <std::floating_point Float> class integrator final
 {
   public:
+    using array1 = typename butcher_tableau<Float>::array1;
+    using array2 = typename butcher_tableau<Float>::array2;
+
     static inline constexpr Float TOL_PART = 256.f;
 
     integrator(const butcher_tableau<Float> &bt, const timestep<Float> &ts = {1.e-3f},
@@ -171,8 +174,7 @@ template <std::floating_point Float> class integrator final
         }
     }
 
-    std::vector<Float> generate_solution(Float timestep, const std::vector<Float> &vars,
-                                         const std::vector<Float> &coefs);
+    std::vector<Float> generate_solution(Float timestep, const std::vector<Float> &vars, const array1 &coefs);
 
     static Float embedded_error(const std::vector<Float> &sol1, const std::vector<Float> &sol2);
     Float reiterative_error(const std::vector<Float> &sol1, const std::vector<Float> &sol2) const;

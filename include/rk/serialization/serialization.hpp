@@ -32,10 +32,13 @@ template <std::floating_point Float> struct kit::yaml::codec<rk::butcher_tableau
     static YAML::Node encode(const rk::butcher_tableau<Float> &tb)
     {
         YAML::Node node;
-        node["Alpha"] = tb.alpha;
-        node[tb.embedded ? "Coefs1" : "Coefs"] = tb.coefs1;
+        for (const float elm : tb.alpha)
+            node["Alpha"].push_back(elm);
+        for (const float elm : tb.coefs1)
+            node[tb.embedded ? "Coefs1" : "Coefs"].push_back(elm);
         if (tb.embedded)
-            node["Coefs2"] = tb.coefs2;
+            for (const float elm : tb.coefs2)
+                node["Coefs2"].push_back(elm);
 
         for (auto it = node.begin(); it != node.end(); ++it)
             it->second.SetStyle(YAML::EmitterStyle::Flow);
@@ -43,7 +46,8 @@ template <std::floating_point Float> struct kit::yaml::codec<rk::butcher_tableau
         for (std::size_t i = 0; i < tb.beta.size(); i++)
         {
             YAML::Node child;
-            child = tb.beta[i];
+            for (const float elm : tb.beta[i])
+                child.push_back(elm);
             node["Beta"].push_back(child);
             node["Beta"][i].SetStyle(YAML::EmitterStyle::Flow);
         }
@@ -56,15 +60,18 @@ template <std::floating_point Float> struct kit::yaml::codec<rk::butcher_tableau
     {
         if (!node.IsMap() || (node.size() < 4 && node.size() > 6))
             return false;
+        using array1 = typename rk::butcher_tableau<Float>::array1;
+        using array2 = typename rk::butcher_tableau<Float>::array2;
 
-        std::vector<Float> alpha, coefs1, coefs2;
-        std::vector<std::vector<Float>> beta;
+        array1 alpha, coefs1, coefs2;
+        array2 beta;
         if (node["Beta"])
             for (const auto &n1 : node["Beta"])
             {
-                auto &v1 = beta.emplace_back();
+                array1 v1;
                 for (const auto &n2 : n1)
                     v1.push_back(n2.as<Float>());
+                beta.push_back(v1);
             }
         for (const auto &n : node["Alpha"])
             alpha.push_back(n.as<Float>());

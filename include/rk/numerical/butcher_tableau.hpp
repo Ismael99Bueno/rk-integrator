@@ -1,25 +1,31 @@
 #pragma once
 
 #include "kit/utility/type_constraints.hpp"
-#include <vector>
+#include "kit/container/dynarray.hpp"
 #include <cstdint>
+
+#ifndef RK_TABLEAU_CAPACITY
+#define RK_TABLEAU_CAPACITY 16
+#endif
 
 namespace rk
 {
 template <std::floating_point Float> struct butcher_tableau
 {
-    butcher_tableau() = default;
-    butcher_tableau(const std::vector<Float> &alpha, const std::vector<std::vector<Float>> &beta,
-                    const std::vector<Float> &coefs, std::uint32_t stages, std::uint32_t order);
+    using array1 = kit::dynarray<Float, RK_TABLEAU_CAPACITY>;
+    using array2 = kit::dynarray<array1, RK_TABLEAU_CAPACITY>;
 
-    butcher_tableau(const std::vector<Float> &alpha, const std::vector<std::vector<Float>> &beta,
-                    const std::vector<Float> &coefs1, const std::vector<Float> &coefs2, std::uint32_t stages,
+    butcher_tableau() = default;
+    butcher_tableau(const array1 &alpha, const array2 &beta, const array1 &coefs, std::uint32_t stages,
                     std::uint32_t order);
 
-    std::vector<Float> alpha;
-    std::vector<Float> coefs1;
-    std::vector<Float> coefs2;
-    std::vector<std::vector<Float>> beta;
+    butcher_tableau(const array1 &alpha, const array2 &beta, const array1 &coefs1, const array1 &coefs2,
+                    std::uint32_t stages, std::uint32_t order);
+
+    array1 alpha;
+    array1 coefs1;
+    array1 coefs2;
+    array2 beta;
 
     bool embedded;
     std::uint32_t stages;

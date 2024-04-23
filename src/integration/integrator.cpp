@@ -14,7 +14,7 @@ integrator<Float>::integrator(const butcher_tableau<Float> &bt, const timestep<F
 
 template <std::floating_point Float>
 std::vector<Float> integrator<Float>::generate_solution(const Float timestep, const std::vector<Float> &vars,
-                                                        const std::vector<Float> &coefs)
+                                                        const array1 &coefs)
 {
     KIT_PERF_FUNCTION()
     std::vector<Float> sol;
