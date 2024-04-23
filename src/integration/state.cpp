@@ -4,8 +4,7 @@
 namespace rk
 {
 template <std::floating_point Float>
-state<Float>::state(const std::vector<Float> &vars, const std::uint32_t stages)
-    : m_vars(vars), m_kvec(stages), m_stages(stages)
+state<Float>::state(const std::vector<Float> &vars, const std::uint32_t stages) : m_vars(vars), m_stages(stages)
 {
     resize_kvecs();
 }
@@ -28,12 +27,12 @@ template <std::floating_point Float> void state<Float>::resize(const std::size_t
     resize_kvecs();
 }
 
-template <std::floating_point Float> Float state<Float>::operator[](std::size_t index) const
+template <std::floating_point Float> Float state<Float>::operator[](const std::size_t index) const
 {
     KIT_ASSERT_ERROR(index < m_vars.size(), "Index exceeds container size: {0}", index)
     return m_vars[index];
 }
-template <std::floating_point Float> Float &state<Float>::operator[](std::size_t index)
+template <std::floating_point Float> Float &state<Float>::operator[](const std::size_t index)
 {
     KIT_ASSERT_ERROR(index < m_vars.size(), "Index exceeds container size: {0}", index)
     return m_vars[index];

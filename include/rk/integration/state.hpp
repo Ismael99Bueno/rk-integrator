@@ -30,10 +30,10 @@ template <std::floating_point Float> class state
 
     std::size_t size() const;
     std::uint32_t stages() const;
+    void stages(std::uint32_t stages);
 
   private:
     void resize_kvecs();
-    void stages(std::uint32_t stages);
 
     std::vector<Float> m_vars;
     std::vector<Float> m_kvec;

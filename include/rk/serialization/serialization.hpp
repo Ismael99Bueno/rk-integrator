@@ -100,13 +100,15 @@ template <std::floating_point Float> struct kit::yaml::codec<rk::state<Float>>
         YAML::Node node;
         node["State variables"] = st.vars();
         node["State variables"].SetStyle(YAML::EmitterStyle::Flow);
+        node["Stages"] = st.stages();
         return node;
     }
     static bool decode(const YAML::Node &node, rk::state<Float> &st)
     {
-        if (!node.IsMap() || node.size() != 1)
+        if (!node.IsMap() || node.size() != 2)
             return false;
 
+        st.stages(node["Stages"].as<std::uint32_t>());
         std::vector<Float> vars;
         for (const auto &n : node["State variables"])
             vars.push_back(n.as<Float>());
