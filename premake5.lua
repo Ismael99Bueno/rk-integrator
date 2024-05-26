@@ -2,7 +2,7 @@ project "rk-integrator"
 language "C++"
 cppdialect "c++20"
 
-filter "system:macosx"
+filter "system:macosx or linux"
    buildoptions {
       "-Wall",
       "-Wextra",
