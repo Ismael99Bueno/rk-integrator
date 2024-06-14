@@ -18,6 +18,7 @@ std::vector<Float> integrator<Float>::generate_solution(const Float timestep, co
 {
     KIT_PERF_FUNCTION()
     static std::vector<Float> sol;
+    sol.clear();
     for (std::size_t j = 0; j < vars.size(); j++)
     {
         Float sum = 0.0;
