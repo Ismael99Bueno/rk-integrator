@@ -41,7 +41,8 @@ template <std::floating_point Float> class integrator final
 
         if (m_tableau.embedded)
         {
-            const std::vector<Float> aux_state = generate_solution(ts.value, vars, m_tableau.coefs2);
+            static std::vector<Float> aux_state;
+            aux_state = generate_solution(ts.value, vars, m_tableau.coefs2);
             vars = generate_solution(ts.value, vars, m_tableau.coefs1);
             m_error = embedded_error(vars, aux_state);
         }
@@ -71,11 +72,14 @@ template <std::floating_point Float> class integrator final
 
         for (;;)
         {
+            static std::vector<Float> sol1;
+            static std::vector<Float> sol2;
+
             std::vector<Float> &vars = state.m_vars;
-            std::vector<Float> sol1 = vars;
+            sol1 = vars;
             update_kvec(elapsed, ts.value, vars, ode);
 
-            const std::vector<Float> sol2 = generate_solution(ts.value, vars, m_tableau.coefs1);
+            sol2 = generate_solution(ts.value, vars, m_tableau.coefs1);
             for (std::uint32_t i = 0; i < reiterations; i++)
             {
                 update_kvec(elapsed, ts.value / reiterations, sol1, ode);
@@ -115,10 +119,13 @@ template <std::floating_point Float> class integrator final
 
         for (;;)
         {
+            static std::vector<Float> sol1;
+            static std::vector<Float> sol2;
+
             std::vector<Float> &vars = state.m_vars;
             update_kvec(elapsed, ts.value, vars, ode);
-            const std::vector<Float> sol2 = generate_solution(ts.value, vars, m_tableau.coefs2);
-            const std::vector<Float> sol1 = generate_solution(ts.value, vars, m_tableau.coefs1);
+            sol2 = generate_solution(ts.value, vars, m_tableau.coefs2);
+            sol1 = generate_solution(ts.value, vars, m_tableau.coefs1);
             m_error = embedded_error(sol1, sol2);
 
             const bool too_small = ts.too_small();
@@ -157,7 +164,9 @@ template <std::floating_point Float> class integrator final
         KIT_ASSERT_ERROR(vars.size() * m_tableau.stages == state.m_kvec.size(),
                          "State and k-vectors size mismatch! - vars size: {0}, k-vectors size: {1}", vars.size(),
                          state.m_kvec.size() / m_tableau.stages)
-        std::vector<Float> aux_vars(vars.size());
+
+        static std::vector<Float> aux_vars;
+        aux_vars.resize(vars.size());
 
         auto state_derivative = ode(time, timestep, vars);
         KIT_ASSERT_ERROR(state_derivative.size() == vars.size(),
