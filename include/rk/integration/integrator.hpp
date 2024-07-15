@@ -30,7 +30,7 @@ template <std::floating_point Float> class integrator final
     template <kit::RetCallable<std::vector<float>, float, float, const std::vector<float> &> ODE>
     bool raw_forward(ODE &ode)
     {
-        KIT_PERF_FUNCTION()
+        KIT_PERF_SCOPE("integrator::raw_forward")
         m_valid = true;
 
         if (ts.limited)
@@ -56,7 +56,7 @@ template <std::floating_point Float> class integrator final
     template <kit::RetCallable<std::vector<float>, float, float, const std::vector<float> &> ODE>
     bool reiterative_forward(ODE &ode, std::uint32_t reiterations = 2)
     {
-        KIT_PERF_FUNCTION()
+        KIT_PERF_SCOPE("integrator::reiterative_forward")
         KIT_ASSERT_CRITICAL(reiterations >= 2,
                             "The amount of reiterations has to be greater than 1, otherwise the algorithm will break.")
         KIT_ASSERT_WARN(
@@ -107,7 +107,7 @@ template <std::floating_point Float> class integrator final
     template <kit::RetCallable<std::vector<float>, float, float, const std::vector<float> &> ODE>
     bool embedded_forward(ODE &ode)
     {
-        KIT_PERF_FUNCTION()
+        KIT_PERF_SCOPE("integrator::embedded_forward")
         KIT_ASSERT_CRITICAL(m_tableau.embedded(),
                             "Cannot perform embedded adaptive stepsize without an embedded solution.")
         m_valid = true;
@@ -159,8 +159,8 @@ template <std::floating_point Float> class integrator final
     template <kit::RetCallable<std::vector<float>, float, float, const std::vector<float> &> ODE>
     void update_kvec(Float time, Float timestep, const std::vector<Float> &vars, ODE &ode)
     {
+        KIT_PERF_SCOPE("integrator::update_kvec")
         KIT_ASSERT_ERROR(timestep >= 0.f, "Timestep must be non-negative")
-        KIT_PERF_FUNCTION()
         KIT_ASSERT_ERROR(vars.size() * m_tableau.stages == state.m_kvec.size(),
                          "State and k-vectors size mismatch! - vars size: {0}, k-vectors size: {1}", vars.size(),
                          state.m_kvec.size() / m_tableau.stages)
