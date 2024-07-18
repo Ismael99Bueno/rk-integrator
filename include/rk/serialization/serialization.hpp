@@ -17,7 +17,7 @@ template <std::floating_point Float> struct kit::yaml::codec<rk::timestep<Float>
     }
     static bool decode(const YAML::Node &node, rk::timestep<Float> &ts)
     {
-        if (!node.IsMap() || node.size() != 4)
+        if (!node.IsMap() || node.size() < 4)
             return false;
         ts.value = node["Value"].as<Float>();
         ts.min = node["Min"].as<Float>();
@@ -105,7 +105,7 @@ template <std::floating_point Float> struct kit::yaml::codec<rk::state<Float>>
     }
     static bool decode(const YAML::Node &node, rk::state<Float> &st)
     {
-        if (!node.IsMap() || node.size() != 2)
+        if (!node.IsMap() || node.size() < 2)
             return false;
 
         st.stages(node["Stages"].as<std::uint32_t>());
@@ -131,7 +131,7 @@ template <std::floating_point Float> struct kit::yaml::codec<rk::integrator<Floa
     }
     static bool decode(const YAML::Node &node, rk::integrator<Float> &integ)
     {
-        if (!node.IsMap() || node.size() != 5)
+        if (!node.IsMap() || node.size() < 5)
             return false;
 
         integ.state = node["State"].as<rk::state<Float>>();
