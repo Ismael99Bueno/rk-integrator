@@ -16,7 +16,7 @@ template <std::floating_point Float>
 std::vector<Float> integrator<Float>::generate_solution(const Float timestep, const std::vector<Float> &vars,
                                                         const array1 &coefs)
 {
-    KIT_PERF_SCOPE("integrator::generate_solution")
+    KIT_PERF_SCOPE("rk::integrator::generate_solution")
     static std::vector<Float> sol;
     sol.clear();
     for (std::size_t j = 0; j < vars.size(); j++)
