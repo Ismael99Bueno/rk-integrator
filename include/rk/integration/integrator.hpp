@@ -27,8 +27,8 @@ template <std::floating_point Float> class integrator final
     Float tolerance;
     Float elapsed = 0.f;
 
-    template <kit::RetCallable<std::vector<float>, float, float, const std::vector<float> &> ODE>
-    bool raw_forward(ODE &ode)
+    template <kit::RetCallable<std::vector<Float>, Float, Float, const std::vector<Float> &> ODE>
+    bool raw_forward(ODE &&ode)
     {
         m_valid = true;
 
@@ -36,7 +36,7 @@ template <std::floating_point Float> class integrator final
             ts.clamp();
 
         std::vector<Float> &vars = state.m_vars;
-        update_kvec(elapsed, ts.value, vars, ode);
+        update_kvec(elapsed, ts.value, vars, std::forward<ODE>(ode));
 
         if (m_tableau.embedded)
         {
@@ -52,8 +52,8 @@ template <std::floating_point Float> class integrator final
         return m_valid;
     }
 
-    template <kit::RetCallable<std::vector<float>, float, float, const std::vector<float> &> ODE>
-    bool reiterative_forward(ODE &ode, std::uint32_t reiterations = 2)
+    template <kit::RetCallable<std::vector<Float>, Float, Float, const std::vector<Float> &> ODE>
+    bool reiterative_forward(ODE &&ode, std::uint32_t reiterations = 2)
     {
         KIT_ASSERT_CRITICAL(reiterations >= 2,
                             "The amount of reiterations has to be greater than 1, otherwise the algorithm will break.")
@@ -75,12 +75,12 @@ template <std::floating_point Float> class integrator final
 
             std::vector<Float> &vars = state.m_vars;
             sol1 = vars;
-            update_kvec(elapsed, ts.value, vars, ode);
+            update_kvec(elapsed, ts.value, vars, std::forward<ODE>(ode));
 
             sol2 = generate_solution(ts.value, vars, m_tableau.coefs1);
             for (std::uint32_t i = 0; i < reiterations; i++)
             {
-                update_kvec(elapsed, ts.value / reiterations, sol1, ode);
+                update_kvec(elapsed, ts.value / reiterations, sol1, std::forward<ODE>(ode));
                 sol1 = generate_solution(ts.value / reiterations, sol1, m_tableau.coefs1);
             }
             m_error = reiterative_error(sol1, sol2);
@@ -102,8 +102,8 @@ template <std::floating_point Float> class integrator final
         return m_valid;
     }
 
-    template <kit::RetCallable<std::vector<float>, float, float, const std::vector<float> &> ODE>
-    bool embedded_forward(ODE &ode)
+    template <kit::RetCallable<std::vector<Float>, Float, Float, const std::vector<Float> &> ODE>
+    bool embedded_forward(ODE &&ode)
     {
         KIT_ASSERT_CRITICAL(m_tableau.embedded(),
                             "Cannot perform embedded adaptive stepsize without an embedded solution.")
@@ -120,7 +120,7 @@ template <std::floating_point Float> class integrator final
             static std::vector<Float> sol2;
 
             std::vector<Float> &vars = state.m_vars;
-            update_kvec(elapsed, ts.value, vars, ode);
+            update_kvec(elapsed, ts.value, vars, std::forward<ODE>(ode));
             sol2 = generate_solution(ts.value, vars, m_tableau.coefs2);
             sol1 = generate_solution(ts.value, vars, m_tableau.coefs1);
             m_error = embedded_error(sol1, sol2);
@@ -153,8 +153,8 @@ template <std::floating_point Float> class integrator final
     Float m_error = 0.f;
     bool m_valid = true;
 
-    template <kit::RetCallable<std::vector<float>, float, float, const std::vector<float> &> ODE>
-    void update_kvec(Float time, Float timestep, const std::vector<Float> &vars, ODE &ode)
+    template <kit::RetCallable<std::vector<Float>, Float, Float, const std::vector<Float> &> ODE>
+    void update_kvec(Float time, Float timestep, const std::vector<Float> &vars, ODE &&ode)
     {
         KIT_ASSERT_ERROR(timestep >= 0.f, "Timestep must be non-negative")
         KIT_ASSERT_ERROR(vars.size() * m_tableau.stages == state.m_kvec.size(),
@@ -164,7 +164,7 @@ template <std::floating_point Float> class integrator final
         static std::vector<Float> aux_vars;
         aux_vars.resize(vars.size());
 
-        auto state_derivative = ode(time, timestep, vars);
+        auto state_derivative = std::forward<ODE>(ode)(time, timestep, vars);
         KIT_ASSERT_ERROR(state_derivative.size() == vars.size(),
                          "ODE function must return a vector of the same size as the state vector")
         for (std::size_t i = 0; i < vars.size(); i++)
@@ -179,7 +179,7 @@ template <std::floating_point Float> class integrator final
                     k_sum += m_tableau.beta[i - 1][k] * state(k, j);
                 aux_vars[j] = vars[j] + k_sum * timestep;
             }
-            state_derivative = ode(time + m_tableau.alpha[i - 1] * timestep, timestep, aux_vars);
+            state_derivative = std::forward<ODE>(ode)(time + m_tableau.alpha[i - 1] * timestep, timestep, aux_vars);
             KIT_ASSERT_ERROR(state_derivative.size() == vars.size(),
                              "ODE function must return a vector of the same size as the state vector")
             for (std::size_t j = 0; j < vars.size(); j++)
